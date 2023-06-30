@@ -2,13 +2,13 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:satria_optik/provider/cart_provider.dart';
-import 'package:satria_optik/screen/checkout/checkout_screen.dart';
-import 'package:satria_optik/screen/product/product_detail/product_bottom_sheet.dart';
-import 'package:satria_optik/screen/product/product_detail/product_detail_screen.dart';
 
 import '../../model/cart.dart';
+import '../../provider/cart_provider.dart';
 import '../../provider/lens_provider.dart';
+import '../checkout/checkout_screen.dart';
+import '../product/product_detail/product_bottom_sheet.dart';
+import '../product/product_detail/product_detail_screen.dart';
 
 class CartPage extends StatelessWidget {
   static String routeName = '/cart';
