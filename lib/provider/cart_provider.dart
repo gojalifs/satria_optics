@@ -61,7 +61,6 @@ class CartProvider extends ChangeNotifier {
 
   Future getCart(Cart cart) async {
     int position = _carts!.indexOf(cart);
-    print('cart.id${cart.id}');
     _carts?[position] = await cartHelper.getCart(cart.id!);
     notifyListeners();
   }

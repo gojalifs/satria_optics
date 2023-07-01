@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:satria_optik/provider/favorite_provider.dart';
 
 import 'firebase_options.dart';
 import 'model/cart.dart';
@@ -55,6 +56,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => LensProvider()),
         ChangeNotifierProvider(create: (context) => FrameDetailProvider()),
         ChangeNotifierProvider(create: (context) => CartProvider()),
+        ChangeNotifierProvider(create: (context) => FavoriteProvider()),
       ],
       child: MaterialApp(
         title: 'Flutter Demo',
