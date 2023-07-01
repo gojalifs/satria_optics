@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../model/glass_frame.dart';
 import '../screen/product/product_detail/product_detail_screen.dart';
@@ -8,6 +9,8 @@ class CustomTextFormField extends StatelessWidget {
   final String label;
   final String? Function(String?)? validator;
   final TextInputType? inputType;
+  final List<TextInputFormatter>? inputFormatters;
+  final int? maxLength;
 
   const CustomTextFormField({
     Key? key,
@@ -15,6 +18,8 @@ class CustomTextFormField extends StatelessWidget {
     required this.label,
     this.validator,
     this.inputType,
+    this.inputFormatters,
+    this.maxLength,
   }) : super(key: key);
 
   @override
@@ -22,6 +27,8 @@ class CustomTextFormField extends StatelessWidget {
     return TextFormField(
       controller: controller,
       keyboardType: inputType,
+      inputFormatters: inputFormatters,
+      maxLength: maxLength,
       decoration: InputDecoration(
         labelText: label,
         labelStyle: Theme.of(context).textTheme.labelLarge,

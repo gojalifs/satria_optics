@@ -1,8 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:satria_optik/helper/user_helper.dart';
+import 'package:flutter/services.dart';
 
+import '../../helper/user_helper.dart';
 import '../../utils/common_widget.dart';
 
 class ChangeProfileDetailPage extends StatefulWidget {
@@ -23,9 +22,17 @@ class ChangeProfileDetailPage extends StatefulWidget {
 
 class _ChangeProfileDetailPageState extends State<ChangeProfileDetailPage> {
   TextEditingController controller = TextEditingController();
+  UserHelper userHelper = UserHelper();
+
+  final formKey = GlobalKey<FormState>();
+
+  String? genderValue;
+
   @override
   void initState() {
     controller = TextEditingController(text: widget.data);
+    genderValue = widget.data;
+
     super.initState();
   }
 
@@ -40,86 +47,121 @@ class _ChangeProfileDetailPageState extends State<ChangeProfileDetailPage> {
           ScaffoldMessenger.maybeOf(context)?.hideCurrentSnackBar();
           FocusScope.of(context).unfocus();
         },
-        child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          children: [
-            Text('Change your ${widget.beChanged}'),
-            const SizedBox(height: 20),
-            CustomTextFormField(
-              controller: controller,
-              label: widget.beChanged,
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () async {
-                if (controller.text == widget.data) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Data Not Changed'),
+        child: Form(
+          key: formKey,
+          child: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            children: [
+              Text('Change your ${widget.beChanged}'),
+              const SizedBox(height: 20),
+              if (widget.beChanged != 'Gender')
+                CustomTextFormField(
+                  controller: controller,
+                  label: widget.beChanged,
+                  inputType: TextInputType.phone,
+                  inputFormatters: widget.beChanged == 'Phone'
+                      ? [FilteringTextInputFormatter.allow(RegExp(r'^\+?\d*'))]
+                      : null,
+                  maxLength: widget.beChanged == 'Phone' ? 24 : null,
+                  validator: widget.beChanged == 'Email'
+                      ? (p0) {
+                          if (!p0!.contains('@')) {
+                            return 'Email must contains @';
+                          }
+                          return null;
+                        }
+                      : null,
+                ),
+              if (widget.beChanged == 'Gender')
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    RadioListTile(
+                      value: 'Male',
+                      groupValue: genderValue,
+                      onChanged: (value) {
+                        genderValue = value;
+                        setState(() {});
+                      },
+                      title: const Text('Male'),
                     ),
-                  );
-                  return;
-                }
-                var isPhoneUsed = await isPhoneNumberAlreadyUsed(
-                    controller.text, widget.beChanged.toLowerCase());
-                if (!mounted) {
-                  return;
-                }
-                if (isPhoneUsed) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Data Already Used'),
+                    RadioListTile(
+                      value: 'Female',
+                      groupValue: genderValue,
+                      onChanged: (value) {
+                        genderValue = value;
+                        setState(() {});
+                      },
+                      title: const Text('Female'),
                     ),
-                  );
-                  return;
-                }
-                UserHelper userHelper = UserHelper();
-                var userID = FirebaseAuth.instance.currentUser!.uid;
+                  ],
+                ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () async {
+                  // validate data
+                  if (formKey.currentState!.validate()) {
+                    ScaffoldMessenger.maybeOf(context)?.hideCurrentSnackBar();
 
-                var result = await userHelper
-                    .updateUser(
-                  userID,
-                  {widget.beChanged.toLowerCase(): controller.text.trim()},
-                  context,
-                )
-                    .onError((error, stackTrace) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('$error')),
-                  );
-                  debugPrint('$stackTrace');
-                  return 'error';
-                });
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(result)),
-                  );
-                  Navigator.pop(context);
-                }
-              },
-              child: const Text('Save'),
-            ),
-          ],
+                    // if no data changed
+                    if (controller.text == widget.data &&
+                        widget.beChanged != "Gender") {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Data Not Changed'),
+                        ),
+                      );
+                      return;
+                    }
+
+                    // check for duplicate data
+                    bool isPhoneUsed = await userHelper.isPhoneUsernameUsed(
+                        controller.text, widget.beChanged.toLowerCase());
+                    if (!mounted) {
+                      return;
+                    }
+                    if (isPhoneUsed) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Data Already Used'),
+                        ),
+                      );
+                      return;
+                    }
+
+                    try {
+                      Map<String, dynamic> changedData = {
+                        widget.beChanged.toLowerCase(): controller.text.trim()
+                      };
+                      if (widget.beChanged == 'Gender') {
+                        changedData = {
+                          widget.beChanged.toLowerCase(): genderValue
+                        };
+                      }
+                      var result = await userHelper.updateUser(
+                        changedData,
+                        context,
+                      );
+
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(result)),
+                        );
+                        Navigator.pop(context);
+                      }
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('$e')),
+                      );
+                    }
+                  }
+                },
+                child: const Text('Save'),
+              ),
+            ],
+          ),
         ),
       ),
     );
-  }
-
-  Future<bool> isPhoneNumberAlreadyUsed(String value, String key) async {
-    QuerySnapshot<Map<String, dynamic>> snapshot;
-    if (key == 'phone') {
-      snapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .where('phone', isEqualTo: value)
-          .get();
-    } else if (key == 'username') {
-      snapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .where('username', isEqualTo: value)
-          .get();
-    } else {
-      return false;
-    }
-
-    return snapshot.docs.isNotEmpty;
   }
 }
