@@ -1,54 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:provider/provider.dart';
+import 'package:satria_optik/provider/favorite_provider.dart';
+import 'package:satria_optik/screen/product/product_detail/product_detail_screen.dart';
 
 import '../../model/glass_frame.dart';
 
 class FavouritePage extends StatelessWidget {
   const FavouritePage({super.key});
 
-  static List<GlassFrame> products = [
-    GlassFrame(
-      imageUrl: [
-        "https://assets.glasses.com/is/image/Glasses/805289291015__002.png?impolicy=GL_g-thumbnail-plp"
-      ],
-      name: 'Prescription Glass',
-      price: 250000,
-      rating: '4',
-      colors: {
-        'red': '',
-        'white': '',
-      },
-      description: 'awebewiubewubewu',
-    ),
-    GlassFrame(
-      imageUrl: [
-        "https://cdn.shopify.com/s/files/1/0109/5012/products/RORY_CrystalSlate_52_TQ-1600x1200_8abec855-5208-492b-9217-ee89dd983500.jpg?v=1684520565"
-      ],
-      name: 'Sun Glass',
-      price: 350000,
-      rating: '4.5',
-      colors: {
-        'red': '',
-        'white': '',
-      },
-      description: 'awebewiubewubewu',
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: products.length,
-      itemBuilder: (context, index) {
-        return _FavouriteCard(
-          products: products,
-          index: index,
+    Provider.of<FavoriteProvider>(context, listen: false).getFavs();
+    return Consumer<FavoriteProvider>(
+      builder: (context, favProv, child) {
+        if (favProv.state == ConnectionState.active) {
+          return Center(
+            child: LoadingAnimationWidget.threeArchedCircle(
+                color: Colors.white, size: 25),
+          );
+        }
+        if (favProv.favorites == null || favProv.favorites!.isEmpty) {
+          return const Center(
+            child: Text("You don't have any favorite. Try looking some glass"),
+          );
+        }
+        return ListView.builder(
+          itemCount: favProv.favorites?.length,
+          itemBuilder: (context, index) {
+            return InkWell(
+              onTap: () {
+                Navigator.pushNamed(
+                  context,
+                  ProductDetailPage.routeName,
+                  arguments: favProv.favFrames?[index],
+                );
+              },
+              child: _FavouriteCard(
+                products: favProv.favFrames!,
+                index: index,
+              ),
+            );
+          },
         );
       },
     );
   }
 }
 
-class _FavouriteCard extends StatefulWidget {
+class _FavouriteCard extends StatelessWidget {
   const _FavouriteCard({
     Key? key,
     required this.products,
@@ -57,13 +57,6 @@ class _FavouriteCard extends StatefulWidget {
 
   final List<GlassFrame> products;
   final int index;
-
-  @override
-  State<_FavouriteCard> createState() => _FavouriteCardState();
-}
-
-class _FavouriteCardState extends State<_FavouriteCard> {
-  bool isEdit = false;
 
   @override
   Widget build(BuildContext context) {
@@ -76,53 +69,40 @@ class _FavouriteCardState extends State<_FavouriteCard> {
             leading: ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: Image.network(
-                  widget.products[widget.index].imageUrl![0],
+                  products[index].imageUrl![0],
                   width: 75,
                   fit: BoxFit.cover,
                 )),
-            title: Text(widget.products[widget.index].name!),
+            title: Text(products[index].name!),
             subtitle: Text(
-              '${widget.products[widget.index].price}',
+              '${products[index].price}',
               style: const TextStyle(color: Color.fromARGB(255, 255, 0, 0)),
             ),
-            trailing: IconButton(
-              onPressed: () {
-                isEdit = !isEdit;
-                setState(() {});
-              },
-              icon: const Icon(Icons.edit_rounded),
+            trailing: Consumer<FavoriteProvider>(
+              builder: (context, value, child) => IconButton(
+                onPressed: () async {
+                  try {
+                    await value.removeFavorite(products[index].id!);
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Removed from favorites'),
+                        ),
+                      );
+                      return;
+                    }
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('$e'),
+                      ),
+                    );
+                  }
+                },
+                icon: const Icon(Icons.delete_forever_rounded),
+              ),
             ),
           ),
-          isEdit
-              ? Row(
-                  children: [
-                    Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text('Add To cart'),
-                          IconButton(
-                            onPressed: () {},
-                            icon: const Icon(Icons.add_shopping_cart_rounded),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text('Delete'),
-                          IconButton(
-                            onPressed: () {},
-                            icon: const Icon(Icons.delete_forever_rounded),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                )
-              : const SizedBox()
         ],
       ),
     );

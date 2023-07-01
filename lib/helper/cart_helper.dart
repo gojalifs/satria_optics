@@ -30,6 +30,7 @@ class CartHelper extends FirestoreHelper {
       var frameSnapshot = await frameRef.get().then((value) {
         var data = value.data();
         data?['id'] = value.id;
+        data?['favoritedBy'] = data['favoritedBy'][userID];
         return data;
       });
       var frameData = frameSnapshot;
