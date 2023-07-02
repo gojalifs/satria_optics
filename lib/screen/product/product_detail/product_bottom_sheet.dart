@@ -276,6 +276,7 @@ class ProductDetailBottomSheet extends StatelessWidget {
                                       leftMinus = p0.toString();
 
                                       totalPrice -= leftAdditionalPrice;
+                                      leftAdditionalPrice = 0;
                                       leftAdditionalPrice = 50000 * p0!;
                                       totalPrice += leftAdditionalPrice;
 
@@ -285,6 +286,7 @@ class ProductDetailBottomSheet extends StatelessWidget {
                                       rightMinus = p0.toString();
 
                                       totalPrice -= rightAdditionalPrice;
+                                      rightAdditionalPrice = 0;
                                       rightAdditionalPrice = 50000 * p0!;
                                       totalPrice += rightAdditionalPrice;
 
@@ -294,6 +296,7 @@ class ProductDetailBottomSheet extends StatelessWidget {
                                       leftPlus = p0.toString();
 
                                       totalPrice -= leftAdditionalPriceP;
+                                      leftAdditionalPriceP = 0;
                                       leftAdditionalPriceP = 50000 * p0!;
                                       totalPrice += leftAdditionalPriceP;
 
@@ -303,6 +306,7 @@ class ProductDetailBottomSheet extends StatelessWidget {
                                       rightPlus = p0.toString();
 
                                       totalPrice -= rightAdditionalPriceP;
+                                      rightAdditionalPriceP = 0;
                                       rightAdditionalPriceP = 50000 * p0!;
                                       totalPrice += rightAdditionalPriceP;
 

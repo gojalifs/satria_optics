@@ -10,8 +10,8 @@ import '../model/lens.dart';
 class CartHelper extends FirestoreHelper {
   Future<List<Cart>> getCarts() async {
     List<Cart> carts = [];
-    var cartRef = db.collection('users').doc(userID).collection('carts').get();
-    var data = await cartRef;
+    var cartRef = db.collection('users').doc(userID).collection('carts');
+    var data = await cartRef.get();
     for (var snapshot in data.docs) {
       var cartData = snapshot.data();
       var lensRef = cartData['lens'] as DocumentReference<Map<String, dynamic>>;

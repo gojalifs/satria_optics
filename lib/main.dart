@@ -1,13 +1,15 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:satria_optik/provider/favorite_provider.dart';
 
 import 'firebase_options.dart';
+import 'model/address.dart';
 import 'model/cart.dart';
 import 'model/glass_frame.dart';
 import 'model/order.dart';
+import 'provider/address_provider.dart';
 import 'provider/cart_provider.dart';
+import 'provider/favorite_provider.dart';
 import 'provider/frames_provider.dart';
 import 'provider/lens_provider.dart';
 import 'provider/product_detail_provider.dart';
@@ -23,6 +25,8 @@ import 'screen/message/messenger_screen.dart';
 import 'screen/orders/order_detail_screen.dart';
 import 'screen/product/product_detail/product_detail_screen.dart';
 import 'screen/product/product_list_screen.dart';
+import 'screen/profile/address/add_address_screen.dart';
+import 'screen/profile/address/address_screen.dart';
 import 'screen/profile/change_profile_detail.dart';
 import 'screen/profile/profile_screen.dart';
 import 'screen/promo/promotion_screen.dart';
@@ -56,6 +60,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => LensProvider()),
         ChangeNotifierProvider(create: (context) => FrameDetailProvider()),
         ChangeNotifierProvider(create: (context) => CartProvider()),
+        ChangeNotifierProvider(create: (context) => AddressProvider()),
         ChangeNotifierProvider(create: (context) => FavoriteProvider()),
       ],
       child: MaterialApp(
@@ -72,6 +77,7 @@ class MyApp extends StatelessWidget {
           RegisterPage.routeName: (context) => RegisterPage(),
           ForgotPasswordPage.routeName: (context) => const ForgotPasswordPage(),
           NotificationPage.routeName: (context) => const NotificationPage(),
+          AddressPage.routeName: (context) => const AddressPage(),
         },
         onGenerateRoute: (settings) {
           if (settings.name == PromotionPage.routeName) {
@@ -123,6 +129,16 @@ class MyApp extends StatelessWidget {
             return MaterialPageRoute(
               builder: (context) {
                 return OrderDetailPage(order: args);
+              },
+            );
+          } else if (settings.name == NewAddressPage.routeName) {
+            final args = settings.arguments as Address?;
+            return MaterialPageRoute(
+              builder: (context) {
+                if (args != null) {
+                  return NewAddressPage(address: args);
+                }
+                return const NewAddressPage();
               },
             );
           }
