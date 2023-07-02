@@ -6,31 +6,29 @@ import 'package:satria_optik/model/glass_frame.dart';
 class FavoriteProvider extends ChangeNotifier {
   final FavoriteHelper _helper = FavoriteHelper();
   ConnectionState _state = ConnectionState.none;
-  List<Favorite>? _favorites = [];
+
   List<GlassFrame>? _favFrames = [];
 
   ConnectionState get state => _state;
-  List<Favorite>? get favorites => _favorites;
   List<GlassFrame>? get favFrames => _favFrames;
 
   Future getFavs() async {
-    if (_favorites!.isNotEmpty) {
-      _favorites!.clear();
+    if (favFrames!.isNotEmpty) {
       _favFrames!.clear();
     }
     _state = ConnectionState.active;
-    _favorites = await _helper.getFavorites();
+    List<Favorite>? result = await _helper.getFavorites();
 
-    _favFrames = _favorites?.map((e) => e.frame!).toList();
+    _favFrames = result.map((e) => e.frame!).toList();
 
     _state = ConnectionState.done;
 
     notifyListeners();
   }
 
-  Future<bool> addFavorite(String frameId) async {
+  Future<bool> addFavorite(GlassFrame frame) async {
     try {
-      await _helper.addToFavorite(frameId);
+      await _helper.addToFavorite(frame.id!);
       notifyListeners();
       return true;
     } catch (e) {
@@ -38,9 +36,10 @@ class FavoriteProvider extends ChangeNotifier {
     }
   }
 
-  Future removeFavorite(String frameId) async {
+  Future removeFavorite(GlassFrame frame) async {
     try {
-      await _helper.removeFromFavorite(frameId);
+      await _helper.removeFromFavorite(frame.id!);
+      _favFrames?.remove(frame);
       notifyListeners();
     } catch (e) {
       rethrow;
