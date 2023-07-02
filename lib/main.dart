@@ -1,16 +1,15 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:satria_optik/model/address.dart';
-import 'package:satria_optik/provider/address_provider.dart';
-import 'package:satria_optik/screen/profile/address/add_address_screen.dart';
-import 'package:satria_optik/screen/profile/address/address_screen.dart';
 
 import 'firebase_options.dart';
+import 'model/address.dart';
 import 'model/cart.dart';
 import 'model/glass_frame.dart';
 import 'model/order.dart';
+import 'provider/address_provider.dart';
 import 'provider/cart_provider.dart';
+import 'provider/favorite_provider.dart';
 import 'provider/frames_provider.dart';
 import 'provider/lens_provider.dart';
 import 'provider/product_detail_provider.dart';
@@ -26,6 +25,8 @@ import 'screen/message/messenger_screen.dart';
 import 'screen/orders/order_detail_screen.dart';
 import 'screen/product/product_detail/product_detail_screen.dart';
 import 'screen/product/product_list_screen.dart';
+import 'screen/profile/address/add_address_screen.dart';
+import 'screen/profile/address/address_screen.dart';
 import 'screen/profile/change_profile_detail.dart';
 import 'screen/profile/profile_screen.dart';
 import 'screen/promo/promotion_screen.dart';
@@ -60,6 +61,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => FrameDetailProvider()),
         ChangeNotifierProvider(create: (context) => CartProvider()),
         ChangeNotifierProvider(create: (context) => AddressProvider()),
+        ChangeNotifierProvider(create: (context) => FavoriteProvider()),
       ],
       child: MaterialApp(
         title: 'Flutter Demo',

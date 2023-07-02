@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:satria_optik/model/glass_frame.dart';
 
 class Favorite {
@@ -10,6 +12,16 @@ class Favorite {
     this.id,
     this.frame,
   });
+
+  factory Favorite.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> snapshot,
+    GlassFrame frame,
+  ) {
+    return Favorite(
+      id: snapshot.id,
+      frame: frame,
+    );
+  }
 
   Map<String, dynamic> toMap() {
     return {
@@ -27,7 +39,16 @@ class Favorite {
 
   String toJson() => json.encode(toMap());
 
-  factory Favorite.fromJson(String source) {
-    return Favorite.fromMap(json.decode(source));
+  factory Favorite.fromJson(String source) =>
+      Favorite.fromMap(json.decode(source));
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is Favorite && other.id == id && other.frame == frame;
   }
+
+  @override
+  int get hashCode => id.hashCode ^ frame.hashCode;
 }
