@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:satria_optik/provider/transaction_provider.dart';
+import 'package:satria_optik/screen/checkout/select_address_screen.dart';
 
 import 'firebase_options.dart';
 import 'model/address.dart';
@@ -62,6 +64,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => CartProvider()),
         ChangeNotifierProvider(create: (context) => AddressProvider()),
         ChangeNotifierProvider(create: (context) => FavoriteProvider()),
+        ChangeNotifierProvider(create: (context) => TransactionProvider()),
       ],
       child: MaterialApp(
         title: 'Flutter Demo',
@@ -78,6 +81,7 @@ class MyApp extends StatelessWidget {
           ForgotPasswordPage.routeName: (context) => const ForgotPasswordPage(),
           NotificationPage.routeName: (context) => const NotificationPage(),
           AddressPage.routeName: (context) => const AddressPage(),
+          SelectAddressSPage.routeName: (context) => const SelectAddressSPage(),
         },
         onGenerateRoute: (settings) {
           if (settings.name == PromotionPage.routeName) {

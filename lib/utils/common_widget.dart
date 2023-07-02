@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../model/address.dart';
 import '../model/glass_frame.dart';
 import '../screen/product/product_detail/product_detail_screen.dart';
 
@@ -97,6 +98,49 @@ class ProductCard extends StatelessWidget {
               )
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class AddressCard extends StatelessWidget {
+  const AddressCard({
+    super.key,
+    required this.address,
+  });
+
+  final Address? address;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              address!.receiverName,
+              style: const TextStyle(
+                fontSize: 21,
+              ),
+            ),
+            const Divider(),
+            Text(
+              address!.phone,
+              style: const TextStyle(color: Colors.white60),
+            ),
+            Text(
+              '''${address!.street}, ${address!.village}, '''
+              '''${address!.subdistrict}''',
+              style: const TextStyle(color: Colors.white60),
+            ),
+            Text(
+              '${address!.city}, ${address!.province} ${address!.postalCode}',
+              style: const TextStyle(color: Colors.white60),
+            )
+          ],
         ),
       ),
     );
