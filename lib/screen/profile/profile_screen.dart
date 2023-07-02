@@ -4,6 +4,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:satria_optik/provider/user_provider.dart';
 import 'package:satria_optik/screen/auth/login_screen.dart';
+import 'package:satria_optik/screen/profile/address/address_screen.dart';
 
 import '../../helper/user_helper.dart';
 import 'change_profile_detail.dart';
@@ -98,10 +99,15 @@ class ProfilePage extends StatelessWidget {
                     detail: user.gender ?? '',
                   ),
                   const Divider(),
-                  const ListTile(
-                    leading: Icon(Icons.map_rounded),
-                    title: Text('Address'),
-                    trailing: Icon(Icons.navigate_next_rounded),
+                  InkWell(
+                    onTap: () {
+                      Navigator.of(context).pushNamed(AddressPage.routeName);
+                    },
+                    child: const ListTile(
+                      leading: Icon(Icons.map_rounded),
+                      title: Text('Address'),
+                      trailing: Icon(Icons.navigate_next_rounded),
+                    ),
                   ),
                   const Divider(),
                   const Text('Connect Account With'),

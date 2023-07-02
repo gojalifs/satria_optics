@@ -1,7 +1,5 @@
-import 'dart:convert';
-
 class Address {
-  final String id;
+  final String? id;
   final String city;
   final String detail;
   final String phone;
@@ -11,8 +9,9 @@ class Address {
   final String street;
   final String subdistrict;
   final String village;
+  final String country;
   Address({
-    required this.id,
+    this.id,
     required this.city,
     required this.detail,
     required this.phone,
@@ -22,6 +21,7 @@ class Address {
     required this.street,
     required this.subdistrict,
     required this.village,
+    required this.country,
   });
 
   Address copyWith({
@@ -35,6 +35,7 @@ class Address {
     String? street,
     String? subdistrict,
     String? village,
+    String? country,
   }) {
     return Address(
       id: id ?? this.id,
@@ -47,6 +48,7 @@ class Address {
       street: street ?? this.street,
       subdistrict: subdistrict ?? this.subdistrict,
       village: village ?? this.village,
+      country: country ?? this.country,
     );
   }
 
@@ -62,12 +64,13 @@ class Address {
       'street': street,
       'subdistrict': subdistrict,
       'village': village,
+      'country': country,
     };
   }
 
   factory Address.fromMap(Map<String, dynamic> map) {
     return Address(
-      id: map['id'] ?? '',
+      id: map['id'],
       city: map['city'] ?? '',
       detail: map['detail'] ?? '',
       phone: map['phone'] ?? '',
@@ -77,6 +80,7 @@ class Address {
       street: map['street'] ?? '',
       subdistrict: map['subdistrict'] ?? '',
       village: map['village'] ?? '',
+      country: map['country'] ?? '',
     );
   }
 
@@ -99,7 +103,8 @@ class Address {
         other.receiverName == receiverName &&
         other.street == street &&
         other.subdistrict == subdistrict &&
-        other.village == village;
+        other.village == village &&
+        other.country == country;
   }
 
   @override
@@ -113,6 +118,7 @@ class Address {
         receiverName.hashCode ^
         street.hashCode ^
         subdistrict.hashCode ^
-        village.hashCode;
+        village.hashCode ^
+        country.hashCode;
   }
 }

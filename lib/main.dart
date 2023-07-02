@@ -1,6 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:satria_optik/model/address.dart';
+import 'package:satria_optik/provider/address_provider.dart';
+import 'package:satria_optik/screen/profile/address/add_address_screen.dart';
+import 'package:satria_optik/screen/profile/address/address_screen.dart';
 
 import 'firebase_options.dart';
 import 'model/cart.dart';
@@ -55,6 +59,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => LensProvider()),
         ChangeNotifierProvider(create: (context) => FrameDetailProvider()),
         ChangeNotifierProvider(create: (context) => CartProvider()),
+        ChangeNotifierProvider(create: (context) => AddressProvider()),
       ],
       child: MaterialApp(
         title: 'Flutter Demo',
@@ -70,6 +75,7 @@ class MyApp extends StatelessWidget {
           RegisterPage.routeName: (context) => RegisterPage(),
           ForgotPasswordPage.routeName: (context) => const ForgotPasswordPage(),
           NotificationPage.routeName: (context) => const NotificationPage(),
+          AddressPage.routeName: (context) => const AddressPage(),
         },
         onGenerateRoute: (settings) {
           if (settings.name == PromotionPage.routeName) {
@@ -121,6 +127,16 @@ class MyApp extends StatelessWidget {
             return MaterialPageRoute(
               builder: (context) {
                 return OrderDetailPage(order: args);
+              },
+            );
+          } else if (settings.name == NewAddressPage.routeName) {
+            final args = settings.arguments as Address?;
+            return MaterialPageRoute(
+              builder: (context) {
+                if (args != null) {
+                  return NewAddressPage(address: args);
+                }
+                return const NewAddressPage();
               },
             );
           }
