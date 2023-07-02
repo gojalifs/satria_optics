@@ -20,13 +20,13 @@ class FavouritePage extends StatelessWidget {
                 color: Colors.white, size: 25),
           );
         }
-        if (favProv.favorites == null || favProv.favorites!.isEmpty) {
+        if (favProv.favFrames!.isEmpty) {
           return const Center(
             child: Text("You don't have any favorite. Try looking some glass"),
           );
         }
         return ListView.builder(
-          itemCount: favProv.favorites?.length,
+          itemCount: favProv.favFrames?.length,
           itemBuilder: (context, index) {
             return InkWell(
               onTap: () {
@@ -82,7 +82,7 @@ class _FavouriteCard extends StatelessWidget {
               builder: (context, value, child) => IconButton(
                 onPressed: () async {
                   try {
-                    await value.removeFavorite(products[index].id!);
+                    await value.removeFavorite(products[index]);
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(

@@ -166,7 +166,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                 },
                               );
                               if (frameProv.frame!.favoritedBy!) {
-                                await favProv.removeFavorite(frame.id!);
+                                await favProv.removeFavorite(frame);
                                 if (!mounted) {
                                   return;
                                 }
@@ -179,7 +179,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                   ),
                                 );
                               } else {
-                                await favProv.addFavorite(frame.id!);
+                                await favProv.addFavorite(frame);
                                 if (!mounted) {
                                   return;
                                 }

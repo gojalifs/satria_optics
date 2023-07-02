@@ -7,13 +7,11 @@ class FavoriteHelper extends FirestoreHelper {
   Future<List<Favorite>> getFavorites() async {
     List<Favorite> favs = [];
 
-    final favRef = db
-        .collection("products")
-        .where("favoritedBy.2Ww3tzRVDZXXef2CSSy0aCuynjh2", isEqualTo: true);
+    final favRef =
+        db.collection("products").where("favoritedBy.$userID", isEqualTo: true);
     var favorites = await favRef.get();
+    FrameHelper frameHelper = FrameHelper();
     for (var element in favorites.docs) {
-      // final DocumentReference<Map<String, dynamic>> frameRef = element['frame'];
-      FrameHelper frameHelper = FrameHelper();
       var favFrame = await frameHelper.getFrame(element.id);
 
       favs.add(Favorite.fromFirestore(
