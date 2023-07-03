@@ -7,6 +7,7 @@ class CheckoutHelper extends FirestoreHelper {
     try {
       var checkoutRef =
           db.collection('users').doc(userID).collection('transactions').doc();
+      var cartRef = db.collection('users').doc(userID).collection('carts');
       var data = transaction.toMap();
       data['address'] = db
           .collection('users')
@@ -14,17 +15,15 @@ class CheckoutHelper extends FirestoreHelper {
           .collection('address')
           .doc(transaction.address!.id);
 
-      data['cartProduct'] = transaction.cartProduct?.map(
-        (e) {
-          return db
-              .collection('users')
-              .doc(userID)
-              .collection('carts')
-              .doc(e.id);
-        },
-      ).toList() as List<DocumentReference<Map<String, dynamic>>>;
+      data['cartProduct'] =
+          transaction.cartProduct?.map((e) => e.toMap()).toList();
 
       await checkoutRef.set(data);
+
+      for (var cart in transaction.cartProduct!) {
+        await cartRef.doc(cart.id).delete();
+      }
+
       return checkoutRef.id;
     } catch (e) {
       throw 'something error';

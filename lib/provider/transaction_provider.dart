@@ -6,11 +6,13 @@ class TransactionProvider extends ChangeNotifier {
   final CheckoutHelper helper = CheckoutHelper();
   ConnectionState _state = ConnectionState.none;
   List<Transactions>? _transactions = [];
+  String _shipper = '';
   int _shippingFee = 0;
   int _discount = 0;
   int _grandTotal = 0;
 
   ConnectionState get state => _state;
+  String get shipper => _shipper;
   List<Transactions>? get transactions => _transactions;
   int get shippingFee => _shippingFee;
   int get discount => _discount;
@@ -18,6 +20,11 @@ class TransactionProvider extends ChangeNotifier {
 
   void addGrandTotal(int total) {
     _grandTotal += total;
+  }
+
+  void setShipper(String shipper) {
+    _shipper = shipper;
+    notifyListeners();
   }
 
   Future<String> addTransaction(Transactions transaction) async {
