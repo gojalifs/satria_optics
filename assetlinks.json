@@ -1,0 +1,10 @@
+[{
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.satria.dev.m.optik.satria_optik",
+      "sha256_cert_fingerprints":
+      ["DD:DF:FF:ED:C3:4D:43:78:79:79:C1:EF:5E:4F:6F:C0:CB:2D:2A:1F:DE:07:07:66:F1:DC:53:F5:DF:A5:57:09"]
+    }
+  }]
+  
