@@ -8,7 +8,11 @@ import 'add_address_screen.dart';
 
 class AddressPage extends StatelessWidget {
   static String routeName = '/address';
-  const AddressPage({super.key});
+  final bool? isCheckout;
+  const AddressPage({
+    Key? key,
+    this.isCheckout,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -33,10 +37,15 @@ class AddressPage extends StatelessWidget {
                     var address = value.address?[index];
                     return InkWell(
                       onTap: () {
-                        Navigator.of(context).pushNamed(
-                          NewAddressPage.routeName,
-                          arguments: address,
-                        );
+                        if (isCheckout != null && isCheckout!) {
+                          value.setActiveAddress(index);
+                          Navigator.of(context).pop();
+                        } else {
+                          Navigator.of(context).pushNamed(
+                            NewAddressPage.routeName,
+                            arguments: address,
+                          );
+                        }
                       },
                       child: AddressCard(address: address),
                     );

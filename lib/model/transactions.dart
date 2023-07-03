@@ -1,17 +1,20 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
+
 import 'address.dart';
 import 'cart.dart';
 
 class Transactions {
   final String? id;
-  final Cart? cartProduct;
+  final List<Cart>? cartProduct;
   final Address? address;
   final String? shipper;
-  final double? subTotal;
-  final double? shippingFee;
-  final double? discount;
-  final double? total;
+  final int? subTotal;
+  final int? shippingFee;
+  final int? discount;
+  final int? total;
 
   Transactions({
     this.id,
@@ -26,13 +29,13 @@ class Transactions {
 
   Transactions copyWith({
     String? id,
-    Cart? cartProduct,
+    List<Cart>? cartProduct,
     Address? address,
     String? shipper,
-    double? subTotal,
-    double? shippingFee,
-    double? discount,
-    double? total,
+    int? subTotal,
+    int? shippingFee,
+    int? discount,
+    int? total,
   }) {
     return Transactions(
       id: id ?? this.id,
@@ -46,10 +49,23 @@ class Transactions {
     );
   }
 
+  Map<String, dynamic> toFirfestore(List<String> cartId, String addressId) {
+    return {
+      'id': id,
+      'cartProduct': cartId as List<DocumentReference>,
+      'address': addressId as DocumentReference,
+      'shipper': shipper,
+      'subTotal': subTotal,
+      'shippingFee': shippingFee,
+      'discount': discount,
+      'total': total,
+    };
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'cartProduct': cartProduct?.toMap(),
+      'cartProduct': cartProduct?.map((x) => x.toMap()).toList(),
       'address': address?.toMap(),
       'shipper': shipper,
       'subTotal': subTotal,
@@ -62,14 +78,15 @@ class Transactions {
   factory Transactions.fromMap(Map<String, dynamic> map) {
     return Transactions(
       id: map['id'],
-      cartProduct:
-          map['cartProduct'] != null ? Cart.fromMap(map['cartProduct']) : null,
+      cartProduct: map['cartProduct'] != null
+          ? List<Cart>.from(map['cartProduct']?.map((x) => Cart.fromMap(x)))
+          : null,
       address: map['address'] != null ? Address.fromMap(map['address']) : null,
       shipper: map['shipper'],
-      subTotal: map['subTotal']?.toDouble(),
-      shippingFee: map['shippingFee']?.toDouble(),
-      discount: map['discount']?.toDouble(),
-      total: map['total']?.toDouble(),
+      subTotal: map['subTotal']?.toInt(),
+      shippingFee: map['shippingFee']?.toInt(),
+      discount: map['discount']?.toInt(),
+      total: map['total']?.toInt(),
     );
   }
 
@@ -89,7 +106,7 @@ class Transactions {
 
     return other is Transactions &&
         other.id == id &&
-        other.cartProduct == cartProduct &&
+        listEquals(other.cartProduct, cartProduct) &&
         other.address == address &&
         other.shipper == shipper &&
         other.subTotal == subTotal &&

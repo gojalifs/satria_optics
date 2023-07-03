@@ -21,6 +21,7 @@ class SelectAddressSPage extends StatelessWidget {
         onRefresh: () {
           Provider.of<AddressProvider>(context, listen: false).getAddresses();
         },
+        refreshOnStart: true,
         child: Consumer<AddressProvider>(
           builder: (context, value, child) {
             if (value.state == ConnectionState.active) {

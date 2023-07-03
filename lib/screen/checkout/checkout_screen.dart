@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 
-import 'package:satria_optik/provider/address_provider.dart';
-import 'package:satria_optik/provider/cart_provider.dart';
-import 'package:satria_optik/provider/transaction_provider.dart';
-import 'package:satria_optik/screen/checkout/select_address_screen.dart';
-
+import '../../helper/midtrans_helper.dart';
 import '../../model/cart.dart';
+import '../../model/transactions.dart';
+import '../../provider/address_provider.dart';
+import '../../provider/cart_provider.dart';
+import '../../provider/transaction_provider.dart';
+import '../payment/payment_webview.dart';
+import '../profile/address/address_screen.dart';
+import 'select_address_screen.dart';
 
-enum _PaymentMethod { gopay, ovo, shopeepay }
-
-class CheckoutPage extends StatefulWidget {
+class CheckoutPage extends StatelessWidget {
   static String routeName = '/checkout';
   final List<Cart> products;
 
@@ -21,15 +23,17 @@ class CheckoutPage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<CheckoutPage> createState() => _CheckoutPageState();
-}
-
-class _CheckoutPageState extends State<CheckoutPage> {
-  String? paymentMethod;
-  double total = 0;
-
-  @override
   Widget build(BuildContext context) {
+    final MidtransHelper midtransHelper = MidtransHelper();
+    int total = products
+            .map((e) => e.totalPrice)
+            .reduce((value, element) => value! + element!)
+            ?.toInt() ??
+        0;
+    int shipFee = 0;
+    int discount = 0;
+    int grandTotal = total + shipFee + discount;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Checkout'),
@@ -48,8 +52,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         if (value.selectedAddress == null) {
                           return InkWell(
                             onTap: () {
-                              Navigator.of(context)
-                                  .pushNamed(SelectAddressSPage.routeName);
+                              Navigator.of(context).pushNamed(
+                                AddressPage.routeName,
+                                arguments: true,
+                              );
                             },
                             child: const Padding(
                               padding: EdgeInsets.symmetric(vertical: 20),
@@ -122,10 +128,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     padding: const EdgeInsets.all(8),
                     primary: false,
                     shrinkWrap: true,
-                    itemCount: widget.products.length,
+                    itemCount: products.length,
                     itemBuilder: (context, index) {
-                      var cart = widget.products[index];
-                      total += cart.totalPrice!;
+                      var cart = products[index];
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -154,7 +159,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                       children: [
                                         Expanded(
                                           child: Text(
-                                            'IDR ${cart.product.price}',
+                                            formatToRupiah(cart.product.price!),
                                             style: const TextStyle(
                                               color: Colors.white54,
                                             ),
@@ -180,7 +185,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(cart.lens.name!),
-                              Text(cart.lens.price.toString()),
+                              Text(formatToRupiah(cart.lens.price!)),
                             ],
                           ),
                           if (cart.minusData?.leftEyeMinus != null &&
@@ -213,10 +218,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text('Sub Total'),
-                              Text('${cart.totalPrice}'),
+                              Text(formatToRupiah(cart.totalPrice!.toInt())),
                             ],
                           ),
-                          if (widget.products.length != index + 1)
+                          if (products.length != index + 1)
                             const Divider(height: 36),
                         ],
                       );
@@ -233,28 +238,28 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text('Total'),
-                              Text('$total'),
+                              Text(formatToRupiah(total)),
                             ],
                           ),
-                          const Row(
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('Shipping Fee'),
-                              Text('0'),
+                              const Text('Shipping Fee'),
+                              Text(formatToRupiah(shipFee)),
                             ],
                           ),
-                          const Row(
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('Discount'),
-                              Text('0'),
+                              const Text('Discount'),
+                              Text(formatToRupiah(discount)),
                             ],
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text('Grand Total'),
-                              Text('$total'),
+                              Text(formatToRupiah(grandTotal)),
                             ],
                           ),
                         ],
@@ -266,22 +271,78 @@ class _CheckoutPageState extends State<CheckoutPage> {
             ),
             Align(
               alignment: Alignment.bottomCenter,
-              child: InkWell(
-                onTap: () {
-                  /// TODO implement proceed payment navigation
+              child: Consumer2<AddressProvider, TransactionProvider>(
+                builder: (context, addressProf, transactProf, child) {
+                  return InkWell(
+                    onTap: addressProf.selectedAddress == null
+                        ? null
+                        : () async {
+                            var order = Transactions(
+                              address: addressProf.selectedAddress,
+                              cartProduct: products,
+                              discount: discount,
+                              shipper: '',
+                              shippingFee: shipFee,
+                              subTotal: total,
+                              total: grandTotal,
+                            );
+
+                            if (context.mounted) {
+                              showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (context) {
+                                  return LoadingAnimationWidget
+                                      .threeArchedCircle(
+                                          color: Colors.white, size: 25);
+                                },
+                              );
+                            }
+
+                            var orderId =
+                                await transactProf.addTransaction(order);
+                            await midtransHelper
+                                .getTransactToken(orderId, grandTotal)
+                                .then(
+                              (value) {
+                                Navigator.of(context).pushNamed(
+                                  PaymentWebView.routeName,
+                                  arguments: value,
+                                );
+                              },
+                            ).onError((error, stackTrace) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('$error'),
+                                ),
+                              );
+                            });
+                          },
+                    child: Container(
+                      height: 50,
+                      width: double.infinity,
+                      color: addressProf.selectedAddress == null
+                          ? Colors.white38
+                          : Colors.red,
+                      child: const Center(child: Text('Proceed To Payment')),
+                    ),
+                  );
                 },
-                child: Container(
-                  height: 50,
-                  width: double.infinity,
-                  color: Colors.red,
-                  child: const Center(child: Text('Proceed To Payment')),
-                ),
               ),
             )
           ],
         ),
       ),
     );
+  }
+
+  String formatToRupiah(int data) {
+    NumberFormat formatToRupiah = NumberFormat.currency(
+      locale: 'id',
+      symbol: 'Rp',
+    );
+
+    return formatToRupiah.format(data);
   }
 }
 
@@ -306,7 +367,7 @@ class _MinusDataRow extends StatelessWidget {
         Expanded(
           flex: 2,
           child: Text(
-            formatToRupiah(data),
+            formatGrandTotalToRupiah(data),
             textAlign: TextAlign.end,
             style: const TextStyle(color: Colors.white54),
           ),
@@ -315,10 +376,10 @@ class _MinusDataRow extends StatelessWidget {
     );
   }
 
-  String formatToRupiah(String data) {
+  String formatGrandTotalToRupiah(String data) {
     NumberFormat formatToRupiah = NumberFormat.currency(
       locale: 'id',
-      symbol: 'IDR ',
+      symbol: 'Rp',
     );
     var price = double.parse(data) * 50000;
     return formatToRupiah.format(price);
