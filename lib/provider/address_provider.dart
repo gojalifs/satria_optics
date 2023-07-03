@@ -4,16 +4,23 @@ import 'package:satria_optik/model/address.dart';
 
 class AddressProvider extends ChangeNotifier {
   final AddressHelper _helper = AddressHelper();
-  List<Address>? _addresses = [];
   ConnectionState _state = ConnectionState.none;
+  List<Address>? _addresses = [];
+  Address? _selectedAddress;
 
-  List<Address>? get address => _addresses;
   ConnectionState? get state => _state;
+  List<Address>? get address => _addresses;
+  Address? get selectedAddress => _selectedAddress;
 
   Future getAddresses() async {
     _state = ConnectionState.active;
     _addresses = await _helper.getAddresses();
     _state = ConnectionState.done;
+    notifyListeners();
+  }
+
+  Future setActiveAddress(int index) async {
+    _selectedAddress = _addresses?[index];
     notifyListeners();
   }
 

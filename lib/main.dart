@@ -13,16 +13,21 @@ import 'provider/favorite_provider.dart';
 import 'provider/frames_provider.dart';
 import 'provider/lens_provider.dart';
 import 'provider/product_detail_provider.dart';
+import 'provider/transaction_provider.dart';
 import 'provider/user_provider.dart';
 import 'screen/auth/forgot_password_screen.dart';
 import 'screen/auth/login_screen.dart';
 import 'screen/auth/register_screen.dart';
 import 'screen/cart/cart_screen.dart';
 import 'screen/checkout/checkout_screen.dart';
+import 'screen/checkout/select_address_screen.dart';
 import 'screen/home/home_navigation_controller.dart';
 import 'screen/message/conversation_screen.dart';
 import 'screen/message/messenger_screen.dart';
 import 'screen/orders/order_detail_screen.dart';
+import 'screen/payment/payment_pending_screen.dart';
+import 'screen/payment/payment_success_screen.dart';
+import 'screen/payment/payment_webview.dart';
 import 'screen/product/product_detail/product_detail_screen.dart';
 import 'screen/product/product_list_screen.dart';
 import 'screen/profile/address/add_address_screen.dart';
@@ -62,6 +67,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => CartProvider()),
         ChangeNotifierProvider(create: (context) => AddressProvider()),
         ChangeNotifierProvider(create: (context) => FavoriteProvider()),
+        ChangeNotifierProvider(create: (context) => TransactionProvider()),
       ],
       child: MaterialApp(
         title: 'Flutter Demo',
@@ -77,7 +83,9 @@ class MyApp extends StatelessWidget {
           RegisterPage.routeName: (context) => RegisterPage(),
           ForgotPasswordPage.routeName: (context) => const ForgotPasswordPage(),
           NotificationPage.routeName: (context) => const NotificationPage(),
-          AddressPage.routeName: (context) => const AddressPage(),
+          SelectAddressSPage.routeName: (context) => const SelectAddressSPage(),
+          PaymentSuccessPage.routeName: (context) => const PaymentSuccessPage(),
+          PaymentPendingPage.routeName: (context) => const PaymentPendingPage(),
         },
         onGenerateRoute: (settings) {
           if (settings.name == PromotionPage.routeName) {
@@ -141,8 +149,22 @@ class MyApp extends StatelessWidget {
                 return const NewAddressPage();
               },
             );
+          } else if (settings.name == AddressPage.routeName) {
+            final args = settings.arguments as bool?;
+            return MaterialPageRoute(
+              builder: (context) {
+                if (args != null) {
+                  return AddressPage(isCheckout: args);
+                }
+                return const AddressPage();
+              },
+            );
+          } else if (settings.name == PaymentWebView.routeName) {
+            final args = settings.arguments as Map<String, dynamic>;
+            return MaterialPageRoute(
+              builder: (context) => PaymentWebView(transactToken: args),
+            );
           }
-
           assert(false, 'Need to implement ${settings.name} on routes');
           return null;
         },
