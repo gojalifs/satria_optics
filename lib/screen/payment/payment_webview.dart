@@ -1,17 +1,20 @@
+import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:satria_optik/screen/payment/payment_pending_screen.dart';
+import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../../provider/order_provider.dart';
 import '../home/home_navigation_controller.dart';
-import 'payment_success_screen.dart';
 
 class PaymentWebView extends StatelessWidget {
   static String routeName = '/paymentWebview';
-  final Map<String, dynamic> transactToken;
+  final String url;
+  final String id;
   const PaymentWebView({
     Key? key,
-    required this.transactToken,
+    required this.url,
+    required this.id,
   }) : super(key: key);
 
   @override
@@ -23,6 +26,7 @@ class PaymentWebView extends StatelessWidget {
         NavigationDelegate(
           onProgress: (int progress) {
             // Update loading bar.
+            print(progress);
             LoadingAnimationWidget.threeArchedCircle(
               color: Colors.white,
               size: 25,
@@ -30,27 +34,37 @@ class PaymentWebView extends StatelessWidget {
           },
           onPageStarted: (String url) {},
           onPageFinished: (String url) {},
-          onUrlChange: (change) {
-            if (change.url!.contains('success')) {
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                PaymentSuccessPage.routeName,
-                (route) => route.settings.name == HomeNavigation.routeName,
-              );
+          onUrlChange: (change) async {
+            print(change.url);
+            var provider = Provider.of<OrderProvider>(context, listen: false);
+            if (change.url!.contains('407')) {
+              await provider.getPaymentStatus(id);
+              await provider.updatePaymentStatus(id, 'Expired');
+            }
+            /* Diganti masing masing merchant dengan finish deeplink */
+            else if (change.url!.contains('deeplink')) {
+              await provider.getPaymentStatus(id);
+              await provider.updatePaymentStatus(id, 'Pending');
+            } else if (change.url!.contains('success')) {
+              await provider.getPaymentStatus(id);
+              await provider.updatePaymentStatus(id, 'Paid');
+              await provider.updateDeliveryStatus(id, 'Packing Your Package');
+              print('skip ga?');
+
+              if (context.mounted) {
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  HomeNavigation.routeName,
+                  (route) => false,
+                  arguments: 3,
+                );
+              }
             }
           },
           onWebResourceError: (WebResourceError error) {},
-          onNavigationRequest: (NavigationRequest request) {
-            if (request.url.startsWith('https://www.youtube.com/')) {
-              return NavigationDecision.prevent;
-            }
-            return NavigationDecision.navigate;
-          },
         ),
       )
       ..loadRequest(
-        Uri.parse(
-          transactToken['redirect_url'],
-        ),
+        Uri.parse(url),
       );
     return WillPopScope(
       onWillPop: () {
@@ -62,17 +76,30 @@ class PaymentWebView extends StatelessWidget {
           title: const Text('Proceed Payment'),
           actions: [
             IconButton(
-                onPressed: () {
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    PaymentPendingPage.routeName,
-                    (route) => route.settings.name == HomeNavigation.routeName,
-                  );
-                },
-                icon: const Icon(Icons.close_rounded))
+              onPressed: () {
+                controller.reload();
+              },
+              icon: const Icon(Icons.refresh_rounded),
+            ),
+            IconButton(
+              onPressed: () {
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  HomeNavigation.routeName,
+                  (route) => false,
+                  arguments: 3,
+                );
+              },
+              icon: const Icon(Icons.close_rounded),
+            ),
           ],
         ),
-        body: WebViewWidget(
-          controller: controller,
+        body: EasyRefresh(
+          onRefresh: () {
+            controller.reload();
+          },
+          child: WebViewWidget(
+            controller: controller,
+          ),
         ),
       ),
     );

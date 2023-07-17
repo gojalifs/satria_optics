@@ -20,11 +20,17 @@ class TransactionProvider extends ChangeNotifier {
     _grandTotal += total;
   }
 
-  Future<String> addTransaction(Transactions transaction) async {
+  Future<String> addTransaction(
+      Transactions transaction, List<String> cartId) async {
     _state = ConnectionState.active;
-    var transactId = await helper.addTransaction(transaction);
+    var transactId = await helper.addTransaction(transaction, cartId);
     _state = ConnectionState.done;
     notifyListeners();
     return transactId;
+  }
+
+  Future updatePaymentData(
+      String transactId, String paymentId, String redirectUrl) async {
+    await helper.updatePaymentData(transactId, paymentId, redirectUrl);
   }
 }

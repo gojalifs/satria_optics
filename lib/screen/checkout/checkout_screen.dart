@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:satria_optik/utils/custom_function.dart';
 
 import '../../helper/midtrans_helper.dart';
 import '../../model/cart.dart';
@@ -25,6 +26,7 @@ class CheckoutPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final MidtransHelper midtransHelper = MidtransHelper();
+    final formatter = Format();
     int total = products
             .map((e) => e.totalPrice)
             .reduce((value, element) => value! + element!)
@@ -32,7 +34,9 @@ class CheckoutPage extends StatelessWidget {
         0;
     int shipFee = 0;
     int discount = 0;
+    List<String> cartId = [];
     int grandTotal = total + shipFee + discount;
+    String? shipper = 'JNE';
 
     return Scaffold(
       appBar: AppBar(
@@ -131,6 +135,7 @@ class CheckoutPage extends StatelessWidget {
                     itemCount: products.length,
                     itemBuilder: (context, index) {
                       var cart = products[index];
+                      cartId.add(cart.id ?? '');
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -159,7 +164,8 @@ class CheckoutPage extends StatelessWidget {
                                       children: [
                                         Expanded(
                                           child: Text(
-                                            formatToRupiah(cart.product.price!),
+                                            formatter.formatToRupiah(
+                                                cart.product.price!),
                                             style: const TextStyle(
                                               color: Colors.white54,
                                             ),
@@ -185,7 +191,7 @@ class CheckoutPage extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(cart.lens.name!),
-                              Text(formatToRupiah(cart.lens.price!)),
+                              Text(formatter.formatToRupiah(cart.lens.price!)),
                             ],
                           ),
                           if (cart.minusData?.leftEyeMinus != null &&
@@ -218,7 +224,8 @@ class CheckoutPage extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text('Sub Total'),
-                              Text(formatToRupiah(cart.totalPrice!.toInt())),
+                              Text(formatter
+                                  .formatToRupiah(cart.totalPrice!.toInt())),
                             ],
                           ),
                           if (products.length != index + 1)
@@ -234,32 +241,60 @@ class CheckoutPage extends StatelessWidget {
                     child: Consumer<CartProvider>(
                       builder: (context, value, child) => Column(
                         children: [
+                          StatefulBuilder(
+                            builder: (context, setState) => Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Expanded(flex: 3, child: Text('Shipper')),
+                                Expanded(
+                                  child: DropdownButton(
+                                    isExpanded: true,
+                                    items: const [
+                                      DropdownMenuItem(
+                                        value: 'JNE',
+                                        child: Text('JNE'),
+                                      ),
+                                      DropdownMenuItem(
+                                        value: 'J&T',
+                                        child: Text('J&T'),
+                                      )
+                                    ],
+                                    onChanged: (value) {
+                                      shipper = value;
+                                      setState(() {});
+                                    },
+                                    value: shipper,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text('Total'),
-                              Text(formatToRupiah(total)),
+                              Text(formatter.formatToRupiah(total)),
                             ],
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text('Shipping Fee'),
-                              Text(formatToRupiah(shipFee)),
+                              Text(formatter.formatToRupiah(shipFee)),
                             ],
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text('Discount'),
-                              Text(formatToRupiah(discount)),
+                              Text(formatter.formatToRupiah(discount)),
                             ],
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text('Grand Total'),
-                              Text(formatToRupiah(grandTotal)),
+                              Text(formatter.formatToRupiah(grandTotal)),
                             ],
                           ),
                         ],
@@ -272,7 +307,7 @@ class CheckoutPage extends StatelessWidget {
             Align(
               alignment: Alignment.bottomCenter,
               child: Consumer2<AddressProvider, TransactionProvider>(
-                builder: (context, addressProf, transactProf, child) {
+                builder: (context, addressProf, transactProv, child) {
                   return InkWell(
                     onTap: addressProf.selectedAddress == null
                         ? null
@@ -281,7 +316,7 @@ class CheckoutPage extends StatelessWidget {
                               address: addressProf.selectedAddress,
                               cartProduct: products,
                               discount: discount,
-                              shipper: '',
+                              shipper: shipper,
                               shippingFee: shipFee,
                               subTotal: total,
                               total: grandTotal,
@@ -299,24 +334,31 @@ class CheckoutPage extends StatelessWidget {
                               );
                             }
 
-                            var orderId =
-                                await transactProf.addTransaction(order);
-                            await midtransHelper
-                                .getTransactToken(orderId, grandTotal)
-                                .then(
-                              (value) {
+                            try {
+                              var orderId = await transactProv.addTransaction(
+                                  order, cartId);
+                              print('orderId $orderId');
+                              var transactData = await midtransHelper
+                                  .getTransactToken(orderId, grandTotal);
+                              print('transaction data $transactData');
+                              await transactProv.updatePaymentData(orderId,
+                                  orderId, transactData['redirect_url']);
+                              if (context.mounted) {
                                 Navigator.of(context).pushNamed(
                                   PaymentWebView.routeName,
-                                  arguments: value,
+                                  arguments: {
+                                    'url': transactData['redirect_url'],
+                                    'id': orderId,
+                                  },
                                 );
-                              },
-                            ).onError((error, stackTrace) {
+                              }
+                            } catch (e) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text('$error'),
+                                  content: Text('$e'),
                                 ),
                               );
-                            });
+                            }
                           },
                     child: Container(
                       height: 50,
@@ -334,15 +376,6 @@ class CheckoutPage extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String formatToRupiah(int data) {
-    NumberFormat formatToRupiah = NumberFormat.currency(
-      locale: 'id',
-      symbol: 'Rp',
-    );
-
-    return formatToRupiah.format(data);
   }
 }
 

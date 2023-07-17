@@ -43,6 +43,7 @@ class MidtransHelper extends FirestoreHelper {
         body: jsonEncode(paymentData),
       );
       Map<String, dynamic> data = jsonDecode(resp.body);
+      print(data);
       if (resp.statusCode == 201) {
         return data;
       } else if (resp.statusCode == 401) {

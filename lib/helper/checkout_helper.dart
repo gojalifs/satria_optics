@@ -1,9 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:satria_optik/helper/firestore_helper.dart';
-import 'package:satria_optik/model/transactions.dart';
+import '../model/transactions.dart';
+import 'firestore_helper.dart';
 
 class CheckoutHelper extends FirestoreHelper {
-  Future<String> addTransaction(Transactions transaction) async {
+  Future<String> addTransaction(
+      Transactions transaction, List<String> cartId) async {
     try {
       var checkoutRef =
           db.collection('users').doc(userID).collection('transactions').doc();
@@ -14,20 +14,40 @@ class CheckoutHelper extends FirestoreHelper {
           .collection('address')
           .doc(transaction.address!.id);
 
-      data['cartProduct'] = transaction.cartProduct?.map(
-        (e) {
-          return db
-              .collection('users')
-              .doc(userID)
-              .collection('carts')
-              .doc(e.id);
-        },
-      ).toList() as List<DocumentReference<Map<String, dynamic>>>;
+      data['orderMadeTime'] = timestamp;
+      data['paymentExpiry'] = DateTime.now().add(const Duration(days: 1));
 
+      data['cartProduct'] = transaction.cartProduct?.map((e) {
+        return e.toMap();
+      }).toList();
+      print(data['orderMadeTime']);
       await checkoutRef.set(data);
+      for (var i = 0; i < cartId.length; i++) {
+        await db
+            .collection('users')
+            .doc(userID)
+            .collection('carts')
+            .doc(cartId[i])
+            .delete();
+      }
       return checkoutRef.id;
     } catch (e) {
+      print(e);
       throw 'something error';
     }
+  }
+
+  Future updatePaymentData(
+      String transactId, String paymentId, String redirectUrl) async {
+    var ref = db
+        .collection('users')
+        .doc(userID)
+        .collection('transactions')
+        .doc(transactId);
+
+    await ref.update({
+      'paymentId': paymentId,
+      'redirectUrl': redirectUrl,
+    });
   }
 }
