@@ -255,18 +255,13 @@ class OrderDetailPage extends StatelessWidget {
                                       order.copyWith(
                                           redirectUrl:
                                               transactData['redirect_url']);
-                                      print(
-                                          '1 ${transactData['redirect_url']}');
                                     }
                                     if (context.mounted) {
-                                      print('2');
-                                      print(order.redirectUrl);
                                       await Provider.of<TransactionProvider>(
                                               context,
                                               listen: false)
                                           .updatePaymentData(order.id!,
                                               order.id!, order.redirectUrl!);
-                                      print('4');
                                     }
                                     if (context.mounted) {
                                       Navigator.of(context).pushNamed(
@@ -278,7 +273,6 @@ class OrderDetailPage extends StatelessWidget {
                                       );
                                     }
                                   } catch (e) {
-                                    print(e);
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(content: Text('Error, $e')),
                                     );
@@ -319,7 +313,6 @@ class OrderDetailPage extends StatelessWidget {
 
   bool isExpired(Timestamp expiry) {
     var status = DateTime.now().compareTo(expiry.toDate());
-    print(expiry.toDate());
     return status >= 0 ? true : false;
   }
 }

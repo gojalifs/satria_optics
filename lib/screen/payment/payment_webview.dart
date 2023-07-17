@@ -26,7 +26,6 @@ class PaymentWebView extends StatelessWidget {
         NavigationDelegate(
           onProgress: (int progress) {
             // Update loading bar.
-            print(progress);
             LoadingAnimationWidget.threeArchedCircle(
               color: Colors.white,
               size: 25,
@@ -35,7 +34,6 @@ class PaymentWebView extends StatelessWidget {
           onPageStarted: (String url) {},
           onPageFinished: (String url) {},
           onUrlChange: (change) async {
-            print(change.url);
             var provider = Provider.of<OrderProvider>(context, listen: false);
             if (change.url!.contains('407')) {
               await provider.getPaymentStatus(id);
@@ -49,7 +47,6 @@ class PaymentWebView extends StatelessWidget {
               await provider.getPaymentStatus(id);
               await provider.updatePaymentStatus(id, 'Paid');
               await provider.updateDeliveryStatus(id, 'Packing Your Package');
-              print('skip ga?');
 
               if (context.mounted) {
                 Navigator.of(context).pushNamedAndRemoveUntil(

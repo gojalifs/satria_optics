@@ -339,10 +339,8 @@ class CheckoutPage extends StatelessWidget {
                             try {
                               var orderId = await transactProv.addTransaction(
                                   order, cartId);
-                              print('orderId $orderId');
                               var transactData = await midtransHelper
                                   .getTransactToken(orderId, grandTotal);
-                              print('transaction data $transactData');
                               await transactProv.updatePaymentData(orderId,
                                   orderId, transactData['redirect_url']);
                               if (context.mounted) {
