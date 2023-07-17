@@ -32,6 +32,7 @@ class CheckoutPage extends StatelessWidget {
             .reduce((value, element) => value! + element!)
             ?.toInt() ??
         0;
+    String shipper = 'JNE';
     int shipFee = 0;
     int discount = 0;
     List<String> cartId = [];
@@ -237,6 +238,39 @@ class CheckoutPage extends StatelessWidget {
                 ),
                 Card(
                   child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Consumer<TransactionProvider>(
+                      builder: (context, transact, child) => Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('Shipper'),
+                          DropdownButton(
+                            value: transact.shipper,
+                            items: const [
+                              DropdownMenuItem(
+                                value: 'JNE',
+                                child: Text('JNE'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'J&T',
+                                child: Text('J&T'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'SiCepat',
+                                child: Text('SiCepat'),
+                              ),
+                            ],
+                            onChanged: (value) {
+                              transact.setShipper(value!);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Card(
+                  child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Consumer<CartProvider>(
                       builder: (context, value, child) => Column(
@@ -329,7 +363,9 @@ class CheckoutPage extends StatelessWidget {
                                 builder: (context) {
                                   return LoadingAnimationWidget
                                       .threeArchedCircle(
-                                          color: Colors.white, size: 25);
+                                    color: Colors.white,
+                                    size: 25,
+                                  );
                                 },
                               );
                             }
