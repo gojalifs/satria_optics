@@ -6,13 +6,11 @@ class TransactionProvider extends ChangeNotifier {
   final CheckoutHelper helper = CheckoutHelper();
   ConnectionState _state = ConnectionState.none;
   List<Transactions>? _transactions = [];
-  String _shipper = '';
   int _shippingFee = 0;
   int _discount = 0;
   int _grandTotal = 0;
 
   ConnectionState get state => _state;
-  String get shipper => _shipper;
   List<Transactions>? get transactions => _transactions;
   int get shippingFee => _shippingFee;
   int get discount => _discount;
@@ -22,16 +20,18 @@ class TransactionProvider extends ChangeNotifier {
     _grandTotal += total;
   }
 
-  void setShipper(String shipper) {
-    _shipper = shipper;
-    notifyListeners();
-  }
+  Future<String> addTransaction(
+      Transactions transaction, List<String> cartId) async {
 
-  Future<String> addTransaction(Transactions transaction) async {
     _state = ConnectionState.active;
-    var transactId = await helper.addTransaction(transaction);
+    var transactId = await helper.addTransaction(transaction, cartId);
     _state = ConnectionState.done;
     notifyListeners();
     return transactId;
+  }
+
+  Future updatePaymentData(
+      String transactId, String paymentId, String redirectUrl) async {
+    await helper.updatePaymentData(transactId, paymentId, redirectUrl);
   }
 }

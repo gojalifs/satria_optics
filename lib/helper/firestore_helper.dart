@@ -6,13 +6,16 @@ class FirestoreHelper {
   String? _userID;
   FirebaseFirestore _db;
   Reference _storageRef;
+  var _timestamp;
 
   FirestoreHelper()
       : _userID = FirebaseAuth.instance.currentUser!.uid,
         _db = FirebaseFirestore.instance,
-        _storageRef = FirebaseStorage.instance.ref();
+        _storageRef = FirebaseStorage.instance.ref(),
+        _timestamp = FieldValue.serverTimestamp();
 
   String? get userID => _userID;
   FirebaseFirestore get db => _db;
   Reference get storageRef => _storageRef;
+  get timestamp => _timestamp;
 }

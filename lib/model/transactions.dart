@@ -15,6 +15,16 @@ class Transactions {
   final int? shippingFee;
   final int? discount;
   final int? total;
+  final String? receiptNumber;
+  final String? paymentStatus;
+  final String? paymentId;
+  final String? redirectUrl;
+  final String? deliveryStatus;
+  final Timestamp? orderMadeTime;
+  final Timestamp? paymentMadeTime;
+  final Timestamp? paymentExpiry;
+  final Timestamp? receiptUpdateTime;
+  final Timestamp? orderFinishTime;
 
   Transactions({
     this.id,
@@ -25,6 +35,16 @@ class Transactions {
     this.shippingFee,
     this.discount,
     this.total,
+    this.receiptNumber = 'Receipt Not Updated Yet',
+    this.paymentStatus = 'Pending',
+    this.paymentId,
+    this.redirectUrl,
+    this.deliveryStatus = 'Waiting For Payment',
+    this.orderMadeTime,
+    this.paymentMadeTime,
+    this.paymentExpiry,
+    this.receiptUpdateTime,
+    this.orderFinishTime,
   });
 
   Transactions copyWith({
@@ -36,6 +56,16 @@ class Transactions {
     int? shippingFee,
     int? discount,
     int? total,
+    String? receiptNumber,
+    String? paymentStatus,
+    String? paymentId,
+    String? redirectUrl,
+    String? deliveryStatus,
+    Timestamp? orderMadeTime,
+    Timestamp? paymentMadeTime,
+    Timestamp? paymentExpiry,
+    Timestamp? receiptUpdateTime,
+    Timestamp? orderFinishTime,
   }) {
     return Transactions(
       id: id ?? this.id,
@@ -46,6 +76,16 @@ class Transactions {
       shippingFee: shippingFee ?? this.shippingFee,
       discount: discount ?? this.discount,
       total: total ?? this.total,
+      receiptNumber: receiptNumber ?? this.receiptNumber,
+      paymentStatus: paymentStatus ?? this.paymentStatus,
+      paymentId: paymentId ?? this.paymentId,
+      redirectUrl: redirectUrl ?? this.redirectUrl,
+      deliveryStatus: deliveryStatus ?? this.deliveryStatus,
+      orderMadeTime: orderMadeTime ?? this.orderMadeTime,
+      paymentMadeTime: paymentMadeTime ?? this.paymentMadeTime,
+      paymentExpiry: paymentExpiry ?? this.paymentExpiry,
+      receiptUpdateTime: receiptUpdateTime ?? this.receiptUpdateTime,
+      orderFinishTime: orderFinishTime ?? this.orderFinishTime,
     );
   }
 
@@ -58,7 +98,13 @@ class Transactions {
       'subTotal': subTotal,
       'shippingFee': shippingFee,
       'discount': discount,
-      'total': total,
+      'receiptNumber': receiptNumber,
+      'paymentStatus': paymentStatus,
+      'deliveryStatus': deliveryStatus,
+      'orderMadeTime': FieldValue.serverTimestamp(),
+      'paymentMadeTime': paymentMadeTime,
+      'receiptUpdateTime': receiptUpdateTime,
+      'orderFinishTime': orderFinishTime
     };
   }
 
@@ -72,6 +118,16 @@ class Transactions {
       'shippingFee': shippingFee,
       'discount': discount,
       'total': total,
+      'receiptNumber': receiptNumber,
+      'paymentStatus': paymentStatus,
+      'paymentId': paymentId,
+      'redirectUrl': redirectUrl,
+      'deliveryStatus': deliveryStatus,
+      'orderMadeTime': orderMadeTime,
+      'paymentMadeTime': paymentMadeTime,
+      'paymentExpiry': paymentExpiry,
+      'receiptUpdateTime': receiptUpdateTime,
+      'orderFinishTime': orderFinishTime,
     };
   }
 
@@ -87,6 +143,16 @@ class Transactions {
       shippingFee: map['shippingFee']?.toInt(),
       discount: map['discount']?.toInt(),
       total: map['total']?.toInt(),
+      receiptNumber: map['receiptNumber'],
+      paymentStatus: map['paymentStatus'],
+      paymentId: map['paymentId'],
+      redirectUrl: map['redirectUrl'],
+      deliveryStatus: map['deliveryStatus'],
+      orderMadeTime: map['orderMadeTime'],
+      paymentMadeTime: map['paymentMadeTime'],
+      paymentExpiry: map['paymentExpiry'],
+      receiptUpdateTime: map['receiptUpdateTime'],
+      orderFinishTime: map['orderFinishTime'],
     );
   }
 
@@ -94,11 +160,6 @@ class Transactions {
 
   factory Transactions.fromJson(String source) =>
       Transactions.fromMap(json.decode(source));
-
-  @override
-  String toString() {
-    return 'Transactions(id: $id, cartProduct: $cartProduct, address: $address, shipper: $shipper, subTotal: $subTotal, shippingFee: $shippingFee, discount: $discount, total: $total)';
-  }
 
   @override
   bool operator ==(Object other) {
@@ -112,7 +173,17 @@ class Transactions {
         other.subTotal == subTotal &&
         other.shippingFee == shippingFee &&
         other.discount == discount &&
-        other.total == total;
+        other.total == total &&
+        other.receiptNumber == receiptNumber &&
+        other.paymentStatus == paymentStatus &&
+        other.paymentId == paymentId &&
+        other.redirectUrl == redirectUrl &&
+        other.deliveryStatus == deliveryStatus &&
+        other.orderMadeTime == orderMadeTime &&
+        other.paymentMadeTime == paymentMadeTime &&
+        other.paymentExpiry == paymentExpiry &&
+        other.receiptUpdateTime == receiptUpdateTime &&
+        other.orderFinishTime == orderFinishTime;
   }
 
   @override
@@ -124,6 +195,21 @@ class Transactions {
         subTotal.hashCode ^
         shippingFee.hashCode ^
         discount.hashCode ^
-        total.hashCode;
+        total.hashCode ^
+        receiptNumber.hashCode ^
+        paymentStatus.hashCode ^
+        paymentId.hashCode ^
+        redirectUrl.hashCode ^
+        deliveryStatus.hashCode ^
+        orderMadeTime.hashCode ^
+        paymentMadeTime.hashCode ^
+        paymentExpiry.hashCode ^
+        receiptUpdateTime.hashCode ^
+        orderFinishTime.hashCode;
+  }
+
+  @override
+  String toString() {
+    return 'Transactions(id: $id, cartProduct: $cartProduct, address: $address, shipper: $shipper, subTotal: $subTotal, shippingFee: $shippingFee, discount: $discount, total: $total, receiptNumber: $receiptNumber, paymentStatus: $paymentStatus, paymentId: $paymentId, redirectUrl: $redirectUrl, deliveryStatus: $deliveryStatus, orderMadeTime: $orderMadeTime, paymentMadeTime: $paymentMadeTime, paymentExpiry: $paymentExpiry, receiptUpdateTime: $receiptUpdateTime, orderFinishTime: $orderFinishTime)';
   }
 }

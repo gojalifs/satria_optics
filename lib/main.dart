@@ -1,12 +1,13 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:satria_optik/model/transactions.dart';
+import 'package:satria_optik/provider/order_provider.dart';
 
 import 'firebase_options.dart';
 import 'model/address.dart';
 import 'model/cart.dart';
 import 'model/glass_frame.dart';
-import 'model/order.dart';
 import 'provider/address_provider.dart';
 import 'provider/cart_provider.dart';
 import 'provider/favorite_provider.dart';
@@ -68,6 +69,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => AddressProvider()),
         ChangeNotifierProvider(create: (context) => FavoriteProvider()),
         ChangeNotifierProvider(create: (context) => TransactionProvider()),
+        ChangeNotifierProvider(create: (context) => OrderProvider()),
       ],
       child: MaterialApp(
         title: 'Flutter Demo',
@@ -75,7 +77,6 @@ class MyApp extends StatelessWidget {
         home: const SplashPage(),
         routes: {
           LoginPage.routeName: (context) => LoginPage(),
-          HomeNavigation.routeName: (context) => const HomeNavigation(),
           ProfilePage.routeName: (context) => const ProfilePage(),
           CartPage.routeName: (context) => const CartPage(),
           ConversationPage.routeName: (context) => const ConversationPage(),
@@ -86,9 +87,15 @@ class MyApp extends StatelessWidget {
           SelectAddressSPage.routeName: (context) => const SelectAddressSPage(),
           PaymentSuccessPage.routeName: (context) => const PaymentSuccessPage(),
           PaymentPendingPage.routeName: (context) => const PaymentPendingPage(),
+          OrderDetailPage.routeName: (context) => const OrderDetailPage(),
         },
         onGenerateRoute: (settings) {
-          if (settings.name == PromotionPage.routeName) {
+          if (settings.name == HomeNavigation.routeName) {
+            final args = settings.arguments as int?;
+            return MaterialPageRoute(
+              builder: (context) => HomeNavigation(index: args),
+            );
+          } else if (settings.name == PromotionPage.routeName) {
             final args = settings.arguments as Map<String, dynamic>;
             return MaterialPageRoute(
               builder: (context) {
@@ -132,13 +139,13 @@ class MyApp extends StatelessWidget {
                 );
               },
             );
-          } else if (settings.name == OrderDetailPage.routeName) {
-            final args = settings.arguments as Order;
-            return MaterialPageRoute(
-              builder: (context) {
-                return OrderDetailPage(order: args);
-              },
-            );
+            // } else if (settings.name == OrderDetailPage.routeName) {
+            //   final args = settings.arguments as Transactions;
+            //   return MaterialPageRoute(
+            //     builder: (context) {
+            //       return OrderDetailPage(order: args);
+            //     },
+            //   );
           } else if (settings.name == NewAddressPage.routeName) {
             final args = settings.arguments as Address?;
             return MaterialPageRoute(
@@ -162,7 +169,10 @@ class MyApp extends StatelessWidget {
           } else if (settings.name == PaymentWebView.routeName) {
             final args = settings.arguments as Map<String, dynamic>;
             return MaterialPageRoute(
-              builder: (context) => PaymentWebView(transactToken: args),
+              builder: (context) => PaymentWebView(
+                url: args['url'],
+                id: args['id'],
+              ),
             );
           }
           assert(false, 'Need to implement ${settings.name} on routes');

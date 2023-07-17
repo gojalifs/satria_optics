@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:satria_optik/screen/cart/cart_screen.dart';
 import 'package:satria_optik/screen/orders/order_list_screen.dart';
 import 'package:satria_optik/screen/product/product_home_screen.dart';
@@ -10,7 +11,11 @@ import 'home_screen.dart';
 
 class HomeNavigation extends StatefulWidget {
   static const routeName = '/home';
-  const HomeNavigation({super.key});
+  final int? index;
+  const HomeNavigation({
+    Key? key,
+    this.index,
+  }) : super(key: key);
 
   @override
   State<HomeNavigation> createState() => _HomeNavigationState();
@@ -41,6 +46,12 @@ class _HomeNavigationState extends State<HomeNavigation> {
   ];
 
   int botNavIndex = 0;
+
+  @override
+  void initState() {
+    botNavIndex = widget.index ?? 0;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
