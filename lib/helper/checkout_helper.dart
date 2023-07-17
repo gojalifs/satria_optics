@@ -7,6 +7,7 @@ class CheckoutHelper extends FirestoreHelper {
     try {
       var checkoutRef =
           db.collection('users').doc(userID).collection('transactions').doc();
+      var cartRef = db.collection('users').doc(userID).collection('carts');
       var data = transaction.toMap();
       data['address'] = db
           .collection('users')
@@ -22,6 +23,7 @@ class CheckoutHelper extends FirestoreHelper {
       }).toList();
       print(data['orderMadeTime']);
       await checkoutRef.set(data);
+
       for (var i = 0; i < cartId.length; i++) {
         await db
             .collection('users')
@@ -30,6 +32,7 @@ class CheckoutHelper extends FirestoreHelper {
             .doc(cartId[i])
             .delete();
       }
+
       return checkoutRef.id;
     } catch (e) {
       print(e);

@@ -22,6 +22,7 @@ class TransactionProvider extends ChangeNotifier {
 
   Future<String> addTransaction(
       Transactions transaction, List<String> cartId) async {
+
     _state = ConnectionState.active;
     var transactId = await helper.addTransaction(transaction, cartId);
     _state = ConnectionState.done;
