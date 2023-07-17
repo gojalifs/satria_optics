@@ -1,8 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:satria_optik/model/transactions.dart';
-import 'package:satria_optik/provider/order_provider.dart';
 
 import 'firebase_options.dart';
 import 'model/address.dart';
@@ -13,6 +11,7 @@ import 'provider/cart_provider.dart';
 import 'provider/favorite_provider.dart';
 import 'provider/frames_provider.dart';
 import 'provider/lens_provider.dart';
+import 'provider/order_provider.dart';
 import 'provider/product_detail_provider.dart';
 import 'provider/transaction_provider.dart';
 import 'provider/user_provider.dart';

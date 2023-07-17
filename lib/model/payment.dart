@@ -3,8 +3,8 @@
 import 'dart:convert';
 
 class Payment {
-  final Transaction_details transaction_details;
-  final Customer_details customer_details;
+  final TransactionDetails transaction_details;
+  final CustomerDetails customer_details;
 
   Payment(this.transaction_details, this.customer_details);
 
@@ -17,8 +17,8 @@ class Payment {
 
   factory Payment.fromMap(Map<String, dynamic> map) {
     return Payment(
-      Transaction_details.fromMap(map['transaction_details']),
-      Customer_details.fromMap(map['customer_details']),
+      TransactionDetails.fromMap(map['transaction_details']),
+      CustomerDetails.fromMap(map['customer_details']),
     );
   }
 
@@ -28,11 +28,11 @@ class Payment {
       Payment.fromMap(json.decode(source));
 }
 
-class Transaction_details {
+class TransactionDetails {
   final String order_id;
   final String gross_amount;
 
-  Transaction_details(this.order_id, this.gross_amount);
+  TransactionDetails(this.order_id, this.gross_amount);
 
   Map<String, dynamic> toMap() {
     return {
@@ -41,8 +41,8 @@ class Transaction_details {
     };
   }
 
-  factory Transaction_details.fromMap(Map<String, dynamic> map) {
-    return Transaction_details(
+  factory TransactionDetails.fromMap(Map<String, dynamic> map) {
+    return TransactionDetails(
       map['order_id'] ?? '',
       map['gross_amount'] ?? '',
     );
@@ -50,16 +50,16 @@ class Transaction_details {
 
   String toJson() => json.encode(toMap());
 
-  factory Transaction_details.fromJson(String source) =>
-      Transaction_details.fromMap(json.decode(source));
+  factory TransactionDetails.fromJson(String source) =>
+      TransactionDetails.fromMap(json.decode(source));
 }
 
-class Customer_details {
+class CustomerDetails {
   final String first_name;
   final String last_name;
   final String email;
   final String phone;
-  Customer_details({
+  CustomerDetails({
     required this.first_name,
     required this.last_name,
     required this.email,
@@ -75,8 +75,8 @@ class Customer_details {
     };
   }
 
-  factory Customer_details.fromMap(Map<String, dynamic> map) {
-    return Customer_details(
+  factory CustomerDetails.fromMap(Map<String, dynamic> map) {
+    return CustomerDetails(
       first_name: map['first_name'] ?? '',
       last_name: map['last_name'] ?? '',
       email: map['email'] ?? '',
@@ -86,6 +86,6 @@ class Customer_details {
 
   String toJson() => json.encode(toMap());
 
-  factory Customer_details.fromJson(String source) =>
-      Customer_details.fromMap(json.decode(source));
+  factory CustomerDetails.fromJson(String source) =>
+      CustomerDetails.fromMap(json.decode(source));
 }
