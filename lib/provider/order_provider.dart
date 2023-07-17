@@ -52,7 +52,6 @@ class OrderProvider extends ChangeNotifier {
     }
     _individualState = ConnectionState.done;
     notifyListeners();
-    print('pay status $_status');
     return _status;
   }
 
@@ -79,17 +78,13 @@ class OrderProvider extends ChangeNotifier {
           paymentExpiry: Timestamp.fromDate(expiry),
           paymentMadeTime: paidAt != null ? Timestamp.fromDate(paidAt) : null,
         );
-        print('updatedOrder $_order');
 
         _orders![index] = _order;
         // }
-        print(_orders![index]);
       }
     } finally {
-      // TODO
       notifyListeners();
     }
-    print('update payment');
   }
 
   Future updateDeliveryStatus(String transactId, String status) async {
@@ -100,7 +95,6 @@ class OrderProvider extends ChangeNotifier {
       _orders![index] = updatedOrder;
       _order = updatedOrder;
     }
-    print('update delivery');
 
     notifyListeners();
   }

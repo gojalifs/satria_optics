@@ -205,7 +205,6 @@ class Orderspage extends StatelessWidget {
   }
 
   Future getPaymentStatus(BuildContext context, Transactions transact) async {
-    print(transact.id);
     String paymentStatus = 'Expired';
 
     if (context.mounted) {

@@ -43,7 +43,6 @@ class OrderHelper extends FirestoreHelper {
   Future<Map<String, dynamic>> getpaymentStatus(String paymentId) async {
     String serverKey = await MidtransHelper().getApiKey();
     Map<String, dynamic> paymentStatus = {};
-    print('payment id $paymentId');
     var url =
         Uri.parse('https://api.sandbox.midtrans.com/v2/$paymentId/status');
     var resp = await http.get(
@@ -55,7 +54,6 @@ class OrderHelper extends FirestoreHelper {
       },
     );
     paymentStatus = jsonDecode(resp.body);
-    print('paymentStatus $paymentStatus');
     return paymentStatus;
   }
 
@@ -73,7 +71,7 @@ class OrderHelper extends FirestoreHelper {
         'paymentMadeTime': paymentTime,
       });
     } catch (e) {
-      print(e);
+      throw ('Something Error Happened');
     }
   }
 

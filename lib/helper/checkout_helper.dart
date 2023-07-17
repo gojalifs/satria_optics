@@ -7,7 +7,6 @@ class CheckoutHelper extends FirestoreHelper {
     try {
       var checkoutRef =
           db.collection('users').doc(userID).collection('transactions').doc();
-      var cartRef = db.collection('users').doc(userID).collection('carts');
       var data = transaction.toMap();
       data['address'] = db
           .collection('users')
@@ -21,7 +20,6 @@ class CheckoutHelper extends FirestoreHelper {
       data['cartProduct'] = transaction.cartProduct?.map((e) {
         return e.toMap();
       }).toList();
-      print(data['orderMadeTime']);
       await checkoutRef.set(data);
 
       for (var i = 0; i < cartId.length; i++) {
@@ -35,7 +33,6 @@ class CheckoutHelper extends FirestoreHelper {
 
       return checkoutRef.id;
     } catch (e) {
-      print(e);
       throw 'something error';
     }
   }
