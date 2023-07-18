@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:satria_optik/screen/profile/avatar_screen.dart';
 
 import 'firebase_options.dart';
 import 'model/address.dart';
@@ -92,6 +93,11 @@ class MyApp extends StatelessWidget {
             return MaterialPageRoute(
               builder: (context) => HomeNavigation(index: args),
             );
+          } else if (settings.name == AvatarPage.routeName) {
+            final args = settings.arguments as String;
+            return MaterialPageRoute(
+              builder: (context) => AvatarPage(heroTag: args),
+            );
           } else if (settings.name == PromotionPage.routeName) {
             final args = settings.arguments as Map<String, dynamic>;
             return MaterialPageRoute(
@@ -136,13 +142,6 @@ class MyApp extends StatelessWidget {
                 );
               },
             );
-            // } else if (settings.name == OrderDetailPage.routeName) {
-            //   final args = settings.arguments as Transactions;
-            //   return MaterialPageRoute(
-            //     builder: (context) {
-            //       return OrderDetailPage(order: args);
-            //     },
-            //   );
           } else if (settings.name == NewAddressPage.routeName) {
             final args = settings.arguments as Address?;
             return MaterialPageRoute(

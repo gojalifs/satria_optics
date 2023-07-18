@@ -1,12 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:provider/provider.dart';
-import 'package:satria_optik/helper/firestore_helper.dart';
 
 import '../model/user.dart';
-import '../provider/user_provider.dart';
+import 'firestore_helper.dart';
 
 class UserHelper extends FirestoreHelper {
   Future createUser(UserProfile user, String uid) async {
@@ -25,23 +22,16 @@ class UserHelper extends FirestoreHelper {
     return data;
   }
 
-  Future<String> updateUser(
-      Map<String, dynamic> data, BuildContext context) async {
-    String returnData = '';
-    var userRef = db.collection('users').doc(userID);
-    await userRef.update(data).then((value) async {
+  Future<UserProfile> updateUser(Map<String, dynamic> data) async {
+    try {
+      var userRef = db.collection('users').doc(userID);
+      await userRef.update(data);
       var profile = await getUser(userID!);
 
-      if (context.mounted) {
-        Provider.of<UserProvider>(context, listen: false).saveUser(
-          UserProfile.fromMap(profile),
-        );
-      }
-      returnData = "Data successfully updated!";
-    }, onError: (e) {
-      throw "Error updating document $e";
-    });
-    return returnData;
+      return UserProfile.fromMap(profile);
+    } catch (e) {
+      throw "Error updating document, $e";
+    }
   }
 
   Future connectWithGoogle() async {

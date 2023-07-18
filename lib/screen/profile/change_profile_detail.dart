@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:satria_optik/provider/user_provider.dart';
 
 import '../../helper/user_helper.dart';
 import '../../utils/common_widget.dart';
@@ -97,66 +99,66 @@ class _ChangeProfileDetailPageState extends State<ChangeProfileDetailPage> {
                   ],
                 ),
               const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () async {
-                  // validate data
-                  if (formKey.currentState!.validate()) {
-                    ScaffoldMessenger.maybeOf(context)?.hideCurrentSnackBar();
+              Consumer<UserProvider>(
+                builder: (context, value, child) => ElevatedButton(
+                  onPressed: () async {
+                    // validate data
+                    if (formKey.currentState!.validate()) {
+                      ScaffoldMessenger.maybeOf(context)?.hideCurrentSnackBar();
 
-                    // if no data changed
-                    if (controller.text == widget.data &&
-                        widget.beChanged != "Gender") {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Data Not Changed'),
-                        ),
-                      );
-                      return;
-                    }
-
-                    // check for duplicate data
-                    bool isPhoneUsed = await userHelper.isPhoneUsernameUsed(
-                        controller.text, widget.beChanged.toLowerCase());
-                    if (!mounted) {
-                      return;
-                    }
-                    if (isPhoneUsed) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Data Already Used'),
-                        ),
-                      );
-                      return;
-                    }
-
-                    try {
-                      Map<String, dynamic> changedData = {
-                        widget.beChanged.toLowerCase(): controller.text.trim()
-                      };
-                      if (widget.beChanged == 'Gender') {
-                        changedData = {
-                          widget.beChanged.toLowerCase(): genderValue
-                        };
-                      }
-                      var result = await userHelper.updateUser(
-                        changedData,
-                        context,
-                      );
-
-                      if (mounted) {
+                      // if no data changed
+                      if (controller.text == widget.data &&
+                          widget.beChanged != "Gender") {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(result)),
+                          const SnackBar(
+                            content: Text('Data Not Changed'),
+                          ),
                         );
-                        Navigator.pop(context);
+                        return;
                       }
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('$e')),
-                      );
+
+                      // check for duplicate data
+                      bool isPhoneUsed = await userHelper.isPhoneUsernameUsed(
+                          controller.text, widget.beChanged.toLowerCase());
+                      if (!mounted) {
+                        return;
+                      }
+                      if (isPhoneUsed) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Data Already Used'),
+                          ),
+                        );
+                        return;
+                      }
+
+                      try {
+                        Map<String, dynamic> changedData = {
+                          widget.beChanged.toLowerCase(): controller.text.trim()
+                        };
+                        if (widget.beChanged == 'Gender') {
+                          changedData = {
+                            widget.beChanged.toLowerCase(): genderValue
+                          };
+                        }
+                        await value.updateUser(changedData);
+
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text("Data successfully updated!")),
+                          );
+                          Navigator.pop(context);
+                        }
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('$e')),
+                        );
+                      }
                     }
-                  }
-                },
-                child: const Text('Save'),
+                  },
+                  child: const Text('Save'),
+                ),
               ),
             ],
           ),
