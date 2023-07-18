@@ -175,6 +175,7 @@ class Orderspage extends StatelessWidget {
                                     ),
                                     IconButton(
                                       onPressed: () async {
+                                        value.order = order;
                                         await getPaymentStatus(context, order);
                                       },
                                       icon: const Icon(Icons.refresh_rounded),
