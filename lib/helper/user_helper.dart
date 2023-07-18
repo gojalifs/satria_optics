@@ -22,13 +22,10 @@ class UserHelper extends FirestoreHelper {
     return data;
   }
 
-  Future<UserProfile> updateUser(Map<String, dynamic> data) async {
+  Future updateUser(Map<String, dynamic> data) async {
     try {
       var userRef = db.collection('users').doc(userID);
       await userRef.update(data);
-      var profile = await getUser(userID!);
-
-      return UserProfile.fromMap(profile);
     } catch (e) {
       throw "Error updating document, $e";
     }
