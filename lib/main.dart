@@ -26,7 +26,6 @@ import 'screen/message/conversation_screen.dart';
 import 'screen/message/messenger_screen.dart';
 import 'screen/orders/order_detail_screen.dart';
 import 'screen/payment/payment_pending_screen.dart';
-import 'screen/payment/payment_success_screen.dart';
 import 'screen/payment/payment_webview.dart';
 import 'screen/product/product_detail/product_detail_screen.dart';
 import 'screen/product/product_list_screen.dart';
@@ -84,7 +83,6 @@ class MyApp extends StatelessWidget {
           ForgotPasswordPage.routeName: (context) => const ForgotPasswordPage(),
           NotificationPage.routeName: (context) => const NotificationPage(),
           SelectAddressSPage.routeName: (context) => const SelectAddressSPage(),
-          PaymentSuccessPage.routeName: (context) => const PaymentSuccessPage(),
           PaymentPendingPage.routeName: (context) => const PaymentPendingPage(),
           OrderDetailPage.routeName: (context) => const OrderDetailPage(),
         },
