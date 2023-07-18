@@ -7,14 +7,14 @@ import 'package:satria_optik/model/transactions.dart';
 import 'package:http/http.dart' as http;
 
 class OrderHelper extends FirestoreHelper {
-  Future<List<Transactions>> getOrders() async {
+  Future<List<Transactions>> getOrders(status) async {
     List<Transactions> orders = [];
-    var ordersRef = db
-        .collection('users')
-        .doc(userID)
-        .collection('transactions')
-        .orderBy('orderMadeTime', descending: true);
-    var query = await ordersRef.get();
+    var ordersRef =
+        db.collection('users').doc(userID).collection('transactions');
+    var query = await ordersRef
+        .where('orderStatus', isEqualTo: status)
+        .orderBy('orderMadeTime', descending: true)
+        .get();
 
     for (var element in query.docs) {
       var data = element.data();
@@ -57,8 +57,13 @@ class OrderHelper extends FirestoreHelper {
     return paymentStatus;
   }
 
-  Future updatePaymentStatus(String transactId, String status,
-      {DateTime? expiryTime, DateTime? paymentTime}) async {
+  Future updatePaymentStatus(
+    String transactId,
+    String status, {
+    DateTime? expiryTime,
+    DateTime? paymentTime,
+    String? orderStatus,
+  }) async {
     var orderRef = db
         .collection('users')
         .doc(userID)
@@ -69,6 +74,7 @@ class OrderHelper extends FirestoreHelper {
         'paymentStatus': status,
         'paymentExpiry': expiryTime,
         'paymentMadeTime': paymentTime,
+        'orderStatus': orderStatus,
       });
     } catch (e) {
       throw ('Something Error Happened');
