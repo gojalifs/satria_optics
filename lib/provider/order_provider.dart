@@ -21,11 +21,15 @@ class OrderProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future getOrders() async {
+  Future getOrdersByStatus(status) async {
     _state = ConnectionState.active;
-    _orders = await _helper.getOrders();
-    _state = ConnectionState.done;
     notifyListeners();
+    try {
+      _orders = await _helper.getOrders(status);
+    } finally {
+      _state = ConnectionState.done;
+      notifyListeners();
+    }
   }
 
   Future getOrder(String id) async {
@@ -67,8 +71,12 @@ class OrderProvider extends ChangeNotifier {
               _status['transaction_status'] == 'settlement'
           ? DateTime.parse(_status['transaction_time'])
           : null;
+      String? orderStatus = _status['transaction_status'] == 'success' ||
+              _status['transaction_status'] == 'settlement'
+          ? 'Packing'
+          : null;
       await _helper.updatePaymentStatus(transactId, status,
-          expiryTime: expiry, paymentTime: paidAt);
+          expiryTime: expiry, paymentTime: paidAt, orderStatus: orderStatus);
 
       var index = _orders?.indexWhere((element) => element.id == transactId);
       if (index != null && index != -1) {

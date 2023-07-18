@@ -25,6 +25,7 @@ class Transactions {
   final Timestamp? paymentExpiry;
   final Timestamp? receiptUpdateTime;
   final Timestamp? orderFinishTime;
+  final String? orderStatus;
 
   Transactions({
     this.id,
@@ -45,6 +46,7 @@ class Transactions {
     this.paymentExpiry,
     this.receiptUpdateTime,
     this.orderFinishTime,
+    this.orderStatus = 'waitingPayment',
   });
 
   Transactions copyWith({
@@ -66,6 +68,7 @@ class Transactions {
     Timestamp? paymentExpiry,
     Timestamp? receiptUpdateTime,
     Timestamp? orderFinishTime,
+    String? orderStatus,
   }) {
     return Transactions(
       id: id ?? this.id,
@@ -86,6 +89,7 @@ class Transactions {
       paymentExpiry: paymentExpiry ?? this.paymentExpiry,
       receiptUpdateTime: receiptUpdateTime ?? this.receiptUpdateTime,
       orderFinishTime: orderFinishTime ?? this.orderFinishTime,
+      orderStatus: orderStatus ?? this.orderStatus,
     );
   }
 
@@ -128,6 +132,7 @@ class Transactions {
       'paymentExpiry': paymentExpiry,
       'receiptUpdateTime': receiptUpdateTime,
       'orderFinishTime': orderFinishTime,
+      'orderStatus': orderStatus,
     };
   }
 
@@ -153,6 +158,7 @@ class Transactions {
       paymentExpiry: map['paymentExpiry'],
       receiptUpdateTime: map['receiptUpdateTime'],
       orderFinishTime: map['orderFinishTime'],
+      orderStatus: map['orderStatus'],
     );
   }
 
@@ -183,7 +189,8 @@ class Transactions {
         other.paymentMadeTime == paymentMadeTime &&
         other.paymentExpiry == paymentExpiry &&
         other.receiptUpdateTime == receiptUpdateTime &&
-        other.orderFinishTime == orderFinishTime;
+        other.orderFinishTime == orderFinishTime &&
+        other.orderStatus == orderStatus;
   }
 
   @override
@@ -205,11 +212,12 @@ class Transactions {
         paymentMadeTime.hashCode ^
         paymentExpiry.hashCode ^
         receiptUpdateTime.hashCode ^
-        orderFinishTime.hashCode;
+        orderFinishTime.hashCode ^
+        orderStatus.hashCode;
   }
 
   @override
   String toString() {
-    return 'Transactions(id: $id, cartProduct: $cartProduct, address: $address, shipper: $shipper, subTotal: $subTotal, shippingFee: $shippingFee, discount: $discount, total: $total, receiptNumber: $receiptNumber, paymentStatus: $paymentStatus, paymentId: $paymentId, redirectUrl: $redirectUrl, deliveryStatus: $deliveryStatus, orderMadeTime: $orderMadeTime, paymentMadeTime: $paymentMadeTime, paymentExpiry: $paymentExpiry, receiptUpdateTime: $receiptUpdateTime, orderFinishTime: $orderFinishTime)';
+    return 'Transactions(id: $id, cartProduct: $cartProduct, address: $address, shipper: $shipper, subTotal: $subTotal, shippingFee: $shippingFee, discount: $discount, total: $total, receiptNumber: $receiptNumber, paymentStatus: $paymentStatus, paymentId: $paymentId, redirectUrl: $redirectUrl, deliveryStatus: $deliveryStatus, orderMadeTime: $orderMadeTime, paymentMadeTime: $paymentMadeTime, paymentExpiry: $paymentExpiry, receiptUpdateTime: $receiptUpdateTime, orderFinishTime: $orderFinishTime), orderStatus: $orderStatus';
   }
 }
