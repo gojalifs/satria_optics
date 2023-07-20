@@ -1,31 +1,34 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
-import 'package:satria_optik/helper/user_helper.dart';
-import 'package:satria_optik/model/user.dart';
-import 'package:satria_optik/provider/user_provider.dart';
 
+import 'package:satria_optik/provider/auth_provider.dart';
+import 'package:satria_optik/screen/auth/tos_screen.dart';
+
+import '../../provider/user_provider.dart';
 import '../home/home_navigation_controller.dart';
-import 'firebase_auth_logic.dart';
 import 'forgot_password_screen.dart';
 import 'register_screen.dart';
 
 class LoginPage extends StatelessWidget {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passController = TextEditingController();
   static const routeName = '/login';
 
-  LoginPage({super.key});
+  const LoginPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        FocusScope.of(context).unfocus();
-        ScaffoldMessenger.maybeOf(context)?.removeCurrentSnackBar();
-      },
-      child: Scaffold(
-        body: SafeArea(
+    final TextEditingController emailController = TextEditingController();
+    final TextEditingController passController = TextEditingController();
+    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+    return Scaffold(
+      body: SafeArea(
+        child: GestureDetector(
+          onTap: () {
+            primaryFocus?.unfocus();
+            ScaffoldMessenger.maybeOf(context)?.removeCurrentSnackBar();
+          },
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
             child: ListView(
@@ -36,6 +39,7 @@ class LoginPage extends StatelessWidget {
                 ),
                 Image.asset('assets/icons/sign-in.png'),
                 Form(
+                  key: formKey,
                   child: Column(
                     children: [
                       TextFormField(
@@ -71,37 +75,108 @@ class LoginPage extends StatelessWidget {
                         alignment: Alignment.centerRight,
                         child: TextButton(
                           onPressed: () {
-                            _navigateToForgotPassword(context);
+                            Navigator.pushNamed(
+                                context, ForgotPasswordPage.routeName);
                           },
                           child: const Text('Forgot Password?'),
                         ),
                       ),
-                      ElevatedButton(
-                        onPressed: () {
-                          _login(context);
-                        },
-                        child: const Text('LOGIN'),
+                      Row(
+                        children: [
+                          Consumer<AuthProvider>(
+                            builder: (context, authProv, child) {
+                              return Checkbox.adaptive(
+                                value: authProv.isTosApproved,
+                                onChanged: (value) {
+                                  authProv.tosValue = !authProv.isTosApproved;
+                                  print(authProv.isTosApproved);
+                                },
+                              );
+                            },
+                          ),
+                          RichText(
+                            text: TextSpan(
+                              children: [
+                                const TextSpan(
+                                  text: 'By logging in, you accept our ',
+                                ),
+                                TextSpan(
+                                  text: 'Term And Privacy Policy',
+                                  style: const TextStyle(
+                                    color: Colors.blue,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                  // Add an onTap function to handle the button tap
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {
+                                      Navigator.of(context)
+                                          .pushNamed(TOSPage.routeName);
+                                    },
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      LoginWithPassword(
+                        emailController: emailController,
+                        passController: passController,
+                        formKey: formKey,
                       ),
                       const SizedBox(height: 20),
-                      const Divider(),
-                      const SizedBox(height: 10),
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          _signWithGoogle(context);
-                        },
-                        icon: const Icon(Icons.g_mobiledata_rounded),
-                        label: const Text('Login Using Google'),
+                      const Row(
+                        children: [
+                          Expanded(child: Divider()),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            child: Text('or'),
+                          ),
+                          Expanded(child: Divider()),
+                        ],
                       ),
                       const SizedBox(height: 10),
-                      ElevatedButton.icon(
-                        onPressed: () {},
-                        icon: const Icon(Icons.apple),
-                        label: const Text('Login Using Apple'),
+                      Consumer<AuthProvider>(
+                        builder: (context, value, child) => ElevatedButton.icon(
+                          onPressed: value.isTosApproved
+                              ? () async {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return LoadingAnimationWidget
+                                          .threeArchedCircle(
+                                              color: Colors.white, size: 25);
+                                    },
+                                  );
+                                  try {
+                                    await value.signWithGoogle().then(
+                                      (value) {
+                                        Navigator.of(context)
+                                            .pushReplacementNamed(
+                                                HomeNavigation.routeName);
+                                      },
+                                    );
+                                  } catch (e) {
+                                    Navigator.of(context).pop();
+                                    if (e.toString().contains('null')) {
+                                      return;
+                                    }
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('$e'),
+                                      ),
+                                    );
+                                  }
+                                }
+                              : null,
+                          icon: const Icon(Icons.g_mobiledata_rounded),
+                          label: const Text('Login Using Google'),
+                        ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 10),
                       TextButton(
                         onPressed: () {
-                          _navigateToRegister(context);
+                          Navigator.pushNamed(context, RegisterPage.routeName);
                         },
                         child: const Text('Don\'t have an account? Register'),
                       ),
@@ -115,69 +190,64 @@ class LoginPage extends StatelessWidget {
       ),
     );
   }
+}
 
-  Future<void> _login(BuildContext context) async {
-    final email = emailController.text.trim();
-    final password = passController.text.trim();
+class LoginWithPassword extends StatelessWidget {
+  const LoginWithPassword({
+    Key? key,
+    required this.emailController,
+    required this.passController,
+    required this.formKey,
+  }) : super(key: key);
 
-    if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter your email and password'),
-        ),
-      );
-      return;
-    }
+  final TextEditingController emailController;
+  final TextEditingController passController;
+  final GlobalKey<FormState> formKey;
 
-    try {
-      await FirebaseAuth.instance
-          .signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      )
-          .then((value) async {
-        var uid = FirebaseAuth.instance.currentUser!.uid;
-
-        var user = await UserHelper().getUser(uid);
-        if (context.mounted) {
-          Provider.of<UserProvider>(context, listen: false)
-              .saveUser(UserProfile.fromMap(user));
-          Navigator.of(context).pushReplacementNamed(HomeNavigation.routeName);
-        }
-      });
-    } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to log in: $error'),
-        ),
-      );
-    }
-  }
-
-  void _navigateToRegister(BuildContext context) {
-    Navigator.pushNamed(context, RegisterPage.routeName);
-  }
-
-  void _navigateToForgotPassword(BuildContext context) {
-    Navigator.pushNamed(context, ForgotPasswordPage.routeName);
-  }
-
-  void _signWithGoogle(BuildContext context) async {
-    // var dataSignIn = await signInWithGoogle();
-    await signInWithGoogle().then((value) async {
-      var uid = value.user!.uid;
-      var user = await UserHelper().getUser(uid);
-      if (context.mounted) {
-        Provider.of<UserProvider>(context, listen: false)
-            .saveUser(UserProfile.fromMap(user));
-        Navigator.of(context).pushReplacementNamed(HomeNavigation.routeName);
-      }
-    }).catchError((error, stackTrace) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('$error'),
-        ),
-      );
-    });
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<AuthProvider>(
+      builder: (context, authProv, child) => ElevatedButton(
+        onPressed: authProv.isTosApproved
+            ? () async {
+                if (formKey.currentState != null &&
+                    formKey.currentState!.validate()) {
+                  try {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return LoadingAnimationWidget.threeArchedCircle(
+                            color: Colors.white, size: 25);
+                      },
+                    );
+                    await authProv
+                        .signWithPassword(emailController.text.trim(),
+                            passController.text.trim())
+                        .then(
+                      (value) {
+                        if (context.mounted) {
+                          Provider.of<UserProvider>(context, listen: false)
+                              .getUser();
+                          Navigator.of(context)
+                              .pushReplacementNamed(HomeNavigation.routeName);
+                        }
+                      },
+                    );
+                  } on FirebaseAuthException {
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Invalid Credentials'),
+                      ),
+                    );
+                  } catch (e) {
+                    debugPrint('$e');
+                  }
+                }
+              }
+            : null,
+        child: const Text('LOGIN'),
+      ),
+    );
   }
 }

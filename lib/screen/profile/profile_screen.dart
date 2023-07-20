@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -38,15 +40,14 @@ class ProfilePage extends StatelessWidget {
                       width: 100,
                       child: value.userProfile?.avatarPath != null &&
                               value.userProfile!.avatarPath!.isNotEmpty
-                          ? Image.network(
-                              value.userProfile!.avatarPath!,
-                              width: 100,
-                              errorBuilder: (context, error, stackTrace) {
-                                return const Icon(
-                                  Icons.person_rounded,
-                                  size: 100,
-                                );
-                              },
+                          ? CircleAvatar(
+                              backgroundColor: Colors.white,
+                              onBackgroundImageError:
+                                  (exception, stackTrace) {},
+                              backgroundImage: MemoryImage(
+                                File(value.userProfile!.image!.path)
+                                    .readAsBytesSync(),
+                              ),
                             )
                           : const Icon(
                               Icons.person_rounded,

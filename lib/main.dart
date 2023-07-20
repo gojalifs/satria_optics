@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:satria_optik/provider/auth_provider.dart';
+import 'package:satria_optik/screen/auth/tos_screen.dart';
 import 'package:satria_optik/screen/profile/avatar_screen.dart';
 
 import 'firebase_options.dart';
@@ -60,6 +62,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (context) => AuthProvider()),
         ChangeNotifierProvider(create: (context) => UserProvider()),
         ChangeNotifierProvider(create: (context) => FrameProvider()),
         ChangeNotifierProvider(create: (context) => LensProvider()),
@@ -75,7 +78,8 @@ class MyApp extends StatelessWidget {
         theme: CustomTheme.customTheme,
         home: const SplashPage(),
         routes: {
-          LoginPage.routeName: (context) => LoginPage(),
+          LoginPage.routeName: (context) => const LoginPage(),
+          TOSPage.routeName: (context) => const TOSPage(),
           ProfilePage.routeName: (context) => const ProfilePage(),
           CartPage.routeName: (context) => const CartPage(),
           ConversationPage.routeName: (context) => const ConversationPage(),

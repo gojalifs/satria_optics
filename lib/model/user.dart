@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 class UserProfile {
   final String? id;
@@ -9,6 +10,7 @@ class UserProfile {
   final String? birth;
   final String? gender;
   final String? avatarPath;
+  final File? image;
 
   UserProfile({
     this.id = '',
@@ -19,6 +21,7 @@ class UserProfile {
     this.birth = '',
     this.gender = '',
     this.avatarPath = '',
+    this.image,
   });
 
   Map<String, dynamic> toMap() {
@@ -31,6 +34,7 @@ class UserProfile {
       'birth': birth,
       'gender': gender,
       'avatarPath': avatarPath,
+      'image': image,
     };
   }
 
@@ -44,6 +48,7 @@ class UserProfile {
       birth: map['birth'],
       gender: map['gender'],
       avatarPath: map['avatarPath'],
+      image: map['image'],
     );
   }
 
@@ -61,6 +66,7 @@ class UserProfile {
     String? birth,
     String? gender,
     String? avatarPath,
+    File? image,
   }) {
     return UserProfile(
       id: id ?? this.id,
@@ -71,12 +77,13 @@ class UserProfile {
       birth: birth ?? this.birth,
       gender: gender ?? this.gender,
       avatarPath: avatarPath ?? this.avatarPath,
+      image: image ?? this.image,
     );
   }
 
   @override
   String toString() {
-    return 'UserProfile(id: $id, name: $name, username: $username, email: $email, phone: $phone, birth: $birth, gender: $gender, avatarPath: $avatarPath)';
+    return 'UserProfile(id: $id, name: $name, username: $username, email: $email, phone: $phone, birth: $birth, gender: $gender, avatarPath: $avatarPath, image: $image)';
   }
 
   @override
@@ -91,7 +98,8 @@ class UserProfile {
         other.phone == phone &&
         other.birth == birth &&
         other.gender == gender &&
-        other.avatarPath == avatarPath;
+        other.avatarPath == avatarPath &&
+        other.image == image;
   }
 
   @override
@@ -103,6 +111,7 @@ class UserProfile {
         phone.hashCode ^
         birth.hashCode ^
         gender.hashCode ^
-        avatarPath.hashCode;
+        avatarPath.hashCode ^
+        image.hashCode;
   }
 }
