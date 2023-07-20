@@ -3,6 +3,8 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
+
+import 'package:satria_optik/model/cart.dart';
 import 'package:satria_optik/utils/custom_function.dart';
 
 import '../../helper/midtrans_helper.dart';
@@ -73,32 +75,68 @@ class OrderDetailPage extends StatelessWidget {
                         ),
                       ),
                       Card(
-                        child: SizedBox(
-                          height: 100,
-                          child: Row(
+                        child: ListView.separated(
+                          padding: const EdgeInsets.all(10),
+                          itemCount: order.cartProduct?.length ?? 0,
+                          primary: false,
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          separatorBuilder: (context, index) {
+                            return const Divider(thickness: 5);
+                          },
+                          itemBuilder: (context, index) => Column(
                             children: [
-                              Container(
-                                width: 100,
-                                decoration: BoxDecoration(
-                                  color: Colors.red,
-                                  borderRadius: BorderRadius.circular(5),
-                                ),
-                                margin: const EdgeInsets.only(right: 10),
-                                child: Image.network(
-                                  order.cartProduct?[0].product
-                                      .colors?[order.cartProduct?[0].color],
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return const Text(
-                                      'Error getting images',
-                                      textAlign: TextAlign.center,
-                                    );
-                                  },
-                                ),
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 100,
+                                    decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                    margin: const EdgeInsets.only(right: 10),
+                                    child: Image.network(
+                                      order.cartProduct?[0].product
+                                          .colors?[order.cartProduct?[0].color],
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return const Text(
+                                          'Error getting images',
+                                          textAlign: TextAlign.center,
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  Text(
+                                    order.cartProduct![index].product.name!,
+                                    style: const TextStyle(fontSize: 25),
+                                  ),
+                                ],
                               ),
-                              Text(
-                                order.cartProduct![0].product.name!,
-                                style: const TextStyle(fontSize: 25),
+                              const Padding(
+                                  padding: EdgeInsets.only(top: 10),
+                                  child: Divider()),
+                              const _DetailRow(
+                                  title: 'Quantity', detail: '1 Pcs'),
+                              _DetailRow(
+                                  title: 'Lens Type',
+                                  detail:
+                                      '''${order.cartProduct![index].lens.name!} '''
+                                      '''${formatter.formatToRupiah(order.cartProduct![index].lens.price!)}'''),
+                              MinusDataPanel(
+                                minusData: order.cartProduct![index].minusData,
+                              ),
+                              _DetailRow(
+                                title: 'Price',
+                                detail: formatter.formatToRupiah(
+                                    order.cartProduct![index].product.price!),
+                              ),
+                              _DetailRow(
+                                title: 'Total',
+                                detail: formatter.formatToRupiah(
+                                  order.cartProduct![index].totalPrice!.toInt(),
+                                ),
                               ),
                             ],
                           ),
@@ -107,33 +145,30 @@ class OrderDetailPage extends StatelessWidget {
                       Card(
                         child: Padding(
                           padding: const EdgeInsets.all(10),
-                          child: ListView.builder(
-                            itemCount: order.cartProduct?.length ?? 0,
-                            primary: false,
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemBuilder: (context, index) => Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const _DetailRow(
-                                    title: 'Quantity', detail: '1 Pcs'),
-                                _DetailRow(
-                                  title: 'Price',
-                                  detail:
-                                      formatter.formatToRupiah(order.subTotal!),
-                                ),
-                                _DetailRow(
-                                  title: 'Delivery Fee',
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              _DetailRow(
+                                  title: 'Subtotal Product(s)',
                                   detail: formatter
-                                      .formatToRupiah(order.shippingFee!),
-                                ),
-                                _DetailRow(
+                                      .formatToRupiah(order.subTotal!)),
+                              _DetailRow(
+                                title: 'Delivery Fee',
+                                detail: formatter
+                                    .formatToRupiah(order.shippingFee!),
+                              ),
+                              _DetailRow(
+                                title: 'Discount',
+                                detail:
+                                    formatter.formatToRupiah(order.discount!),
+                              ),
+                              _DetailRow(
                                   title: 'Grand Total',
-                                  detail:
-                                      formatter.formatToRupiah(order.total!),
-                                ),
-                              ],
-                            ),
+                                  detail: formatter.formatToRupiah(
+                                      order.subTotal! +
+                                          order.shippingFee! -
+                                          order.discount!)),
+                            ],
                           ),
                         ),
                       ),
@@ -314,6 +349,103 @@ class OrderDetailPage extends StatelessWidget {
   bool isExpired(Timestamp expiry) {
     var status = DateTime.now().compareTo(expiry.toDate());
     return status >= 0 ? true : false;
+  }
+}
+
+class MinusDataPanel extends StatefulWidget {
+  final MinusData? minusData;
+  const MinusDataPanel({
+    Key? key,
+    this.minusData,
+  }) : super(key: key);
+
+  @override
+  State<MinusDataPanel> createState() => _MinusDataPanelState();
+}
+
+class _MinusDataPanelState extends State<MinusDataPanel> {
+  bool isExpanded = false;
+  @override
+  Widget build(BuildContext context) {
+    if (widget.minusData!.leftEyeMinus!.isEmpty) {
+      return const SizedBox();
+    }
+    return ExpansionPanelList(
+      elevation: 0,
+      expansionCallback: (panelIndex, isExpanded) {
+        setState(() {
+          this.isExpanded = !isExpanded;
+        });
+      },
+      children: [
+        ExpansionPanel(
+            canTapOnHeader: true,
+            backgroundColor: Colors.transparent,
+            isExpanded: isExpanded,
+            headerBuilder: (context, isExpanded) {
+              return const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Minus Data',
+                  style: TextStyle(
+                    fontSize: 18,
+                  ),
+                ),
+              );
+            },
+            body: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Left Minus'),
+                      Text(
+                        widget.minusData!.leftEyeMinus!.isEmpty
+                            ? '-'
+                            : widget.minusData!.leftEyeMinus!,
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Right Minus'),
+                      Text(
+                        widget.minusData!.leftEyeMinus!.isEmpty
+                            ? '-'
+                            : widget.minusData!.leftEyeMinus!,
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Left Plus'),
+                      Text(
+                        widget.minusData!.leftEyeMinus!.isEmpty
+                            ? '-'
+                            : widget.minusData!.leftEyeMinus!,
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Right Plus'),
+                      Text(
+                        widget.minusData!.leftEyeMinus!.isEmpty
+                            ? '-'
+                            : widget.minusData!.leftEyeMinus!,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            )),
+      ],
+    );
   }
 }
 

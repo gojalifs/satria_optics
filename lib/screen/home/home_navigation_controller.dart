@@ -59,26 +59,29 @@ class _HomeNavigationState extends State<HomeNavigation> {
       onTap: () {
         FocusScope.of(context).unfocus();
       },
-      child: Scaffold(
-        appBar: appBar(botNavIndex),
-        bottomNavigationBar: BottomNavigationBar(
-          items: botNavBarItems,
-          currentIndex: botNavIndex,
-          onTap: (value) {
-            setState(() {
-              botNavIndex = value;
-            });
-          },
+      child: DefaultTabController(
+        length: 5,
+        child: Scaffold(
+          appBar: appBar(botNavIndex),
+          bottomNavigationBar: BottomNavigationBar(
+            items: botNavBarItems,
+            currentIndex: botNavIndex,
+            onTap: (value) {
+              setState(() {
+                botNavIndex = value;
+              });
+            },
+          ),
+          body: botNavIndex == 0
+              ? const HomePage()
+              : botNavIndex == 1
+                  ? const FavouritePage()
+                  : botNavIndex == 2
+                      ? const ProductPage()
+                      : botNavIndex == 3
+                          ? const Orderspage()
+                          : const ProfilePage(),
         ),
-        body: botNavIndex == 0
-            ? const HomePage()
-            : botNavIndex == 1
-                ? const FavouritePage()
-                : botNavIndex == 2
-                    ? const ProductPage()
-                    : botNavIndex == 3
-                        ? const Orderspage()
-                        : const ProfilePage(),
       ),
     );
   }
@@ -140,6 +143,26 @@ class _HomeNavigationState extends State<HomeNavigation> {
       case 3:
         return AppBar(
           title: const Text('Your Orders'),
+          bottom: const TabBar(
+            isScrollable: true,
+            tabs: [
+              Tab(
+                child: Text('Waiting Payment'),
+              ),
+              Tab(
+                child: Text('Packing'),
+              ),
+              Tab(
+                child: Text('Delivering'),
+              ),
+              Tab(
+                child: Text('Completed'),
+              ),
+              Tab(
+                child: Text('Cancelled'),
+              ),
+            ],
+          ),
           actions: [
             IconButton(
               onPressed: () {

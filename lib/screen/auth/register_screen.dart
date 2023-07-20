@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:satria_optik/helper/user_helper.dart';
 import 'package:satria_optik/model/user.dart';
+import 'package:satria_optik/provider/auth_provider.dart';
 import 'package:satria_optik/provider/user_provider.dart';
 import 'package:satria_optik/screen/home/home_navigation_controller.dart';
 import 'package:satria_optik/utils/common_widget.dart';
@@ -71,19 +72,23 @@ class RegisterPage extends StatelessWidget {
                         label: 'Gender',
                       ),
                       const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () async {
-                          await _register(
-                            context,
-                            nameController.text,
-                            emailController.text,
-                            phoneController.text,
-                            passController.text,
-                            birthController.text,
-                            genderController.text,
-                          );
-                        },
-                        child: const Text('REGISTER'),
+                      Consumer2<AuthProvider, UserProvider>(
+                        builder: (context, auth, user, child) => ElevatedButton(
+                          onPressed: () async {
+                            await auth.registerWithEmail(
+                              nameController.text.trim(),
+                              emailController.text.trim(),
+                              phoneController.text.trim(),
+                              passController.text.trim(),
+                              birthController.text.trim(),
+                              genderController.text.trim(),
+                            );
+                            if (context.mounted) {
+                              await user.getUser();
+                            }
+                          },
+                          child: const Text('REGISTER'),
+                        ),
                       ),
                       const SizedBox(height: 20),
                       TextButton(
@@ -100,46 +105,6 @@ class RegisterPage extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-
-  Future<void> _register(BuildContext context, String name, String email,
-      String phone, String password, String birth, String gender) async {
-    UserProfile user = UserProfile(
-      id: null,
-      name: name,
-      email: email,
-      phone: phone,
-      birth: birth,
-      gender: gender,
-      avatarPath: null,
-    );
-
-    var uid = await FirebaseAuth.instance
-        .createUserWithEmailAndPassword(
-      email: emailController.text,
-      password: passController.text,
-    )
-        .catchError((error, stackTrace) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(error.toString()),
-        ),
-      );
-    });
-
-    await UserHelper().createUser(user, uid.user!.uid).then((value) {
-      Provider.of<UserProvider>(context, listen: false).saveUser(user);
-      return Navigator.of(context)
-          .pushReplacementNamed(HomeNavigation.routeName);
-    }).catchError(
-      (error, stackTrace) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(error.toString()),
-          ),
-        );
-      },
     );
   }
 }

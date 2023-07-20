@@ -1,6 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:satria_optik/provider/auth_provider.dart';
+import 'package:satria_optik/screen/auth/tos_screen.dart';
+import 'package:satria_optik/screen/profile/avatar_screen.dart';
 
 import 'firebase_options.dart';
 import 'model/address.dart';
@@ -26,7 +29,6 @@ import 'screen/message/conversation_screen.dart';
 import 'screen/message/messenger_screen.dart';
 import 'screen/orders/order_detail_screen.dart';
 import 'screen/payment/payment_pending_screen.dart';
-import 'screen/payment/payment_success_screen.dart';
 import 'screen/payment/payment_webview.dart';
 import 'screen/product/product_detail/product_detail_screen.dart';
 import 'screen/product/product_list_screen.dart';
@@ -60,6 +62,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (context) => AuthProvider()),
         ChangeNotifierProvider(create: (context) => UserProvider()),
         ChangeNotifierProvider(create: (context) => FrameProvider()),
         ChangeNotifierProvider(create: (context) => LensProvider()),
@@ -75,7 +78,8 @@ class MyApp extends StatelessWidget {
         theme: CustomTheme.customTheme,
         home: const SplashPage(),
         routes: {
-          LoginPage.routeName: (context) => LoginPage(),
+          LoginPage.routeName: (context) => const LoginPage(),
+          TOSPage.routeName: (context) => const TOSPage(),
           ProfilePage.routeName: (context) => const ProfilePage(),
           CartPage.routeName: (context) => const CartPage(),
           ConversationPage.routeName: (context) => const ConversationPage(),
@@ -84,7 +88,6 @@ class MyApp extends StatelessWidget {
           ForgotPasswordPage.routeName: (context) => const ForgotPasswordPage(),
           NotificationPage.routeName: (context) => const NotificationPage(),
           SelectAddressSPage.routeName: (context) => const SelectAddressSPage(),
-          PaymentSuccessPage.routeName: (context) => const PaymentSuccessPage(),
           PaymentPendingPage.routeName: (context) => const PaymentPendingPage(),
           OrderDetailPage.routeName: (context) => const OrderDetailPage(),
         },
@@ -93,6 +96,11 @@ class MyApp extends StatelessWidget {
             final args = settings.arguments as int?;
             return MaterialPageRoute(
               builder: (context) => HomeNavigation(index: args),
+            );
+          } else if (settings.name == AvatarPage.routeName) {
+            final args = settings.arguments as String;
+            return MaterialPageRoute(
+              builder: (context) => AvatarPage(heroTag: args),
             );
           } else if (settings.name == PromotionPage.routeName) {
             final args = settings.arguments as Map<String, dynamic>;
@@ -138,13 +146,6 @@ class MyApp extends StatelessWidget {
                 );
               },
             );
-            // } else if (settings.name == OrderDetailPage.routeName) {
-            //   final args = settings.arguments as Transactions;
-            //   return MaterialPageRoute(
-            //     builder: (context) {
-            //       return OrderDetailPage(order: args);
-            //     },
-            //   );
           } else if (settings.name == NewAddressPage.routeName) {
             final args = settings.arguments as Address?;
             return MaterialPageRoute(

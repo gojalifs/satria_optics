@@ -11,7 +11,7 @@ class FirestoreHelper {
   FieldValue _timestamp;
 
   FirestoreHelper()
-      : _userID = FirebaseAuth.instance.currentUser!.uid,
+      : _userID = FirebaseAuth.instance.currentUser?.uid,
         _db = FirebaseFirestore.instance,
         _storageRef = FirebaseStorage.instance.ref(),
         _timestamp = FieldValue.serverTimestamp();

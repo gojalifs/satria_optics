@@ -7,99 +7,56 @@ import '../../model/transactions.dart';
 import '../../provider/order_provider.dart';
 import 'order_detail_screen.dart';
 
+enum OrderStatus {
+  waitingPayment,
+  packing,
+  delivering,
+  completed,
+  cancelled,
+}
+
 class Orderspage extends StatelessWidget {
   const Orderspage({super.key});
 
-  // static List<GlassFrame> products = [
-  //   GlassFrame(
-  //     imageUrl: [
-  //       "https://assets.glasses.com/is/image/Glasses/805289291015__002.png?impolicy=GL_g-thumbnail-plp"
-  //     ],
-  //     name: 'Prescription Glass',
-  //     price: 250000,
-  //     rating: '4',
-  //     colors: {
-  //       'red': '',
-  //       'white': '',
-  //     },
-  //     description: 'awebewiubewubewu',
-  //   ),
-  //   GlassFrame(
-  //     imageUrl: [
-  //       "https://cdn.shopify.com/s/files/1/0109/5012/products/RORY_CrystalSlate_52_TQ-1600x1200_8abec855-5208-492b-9217-ee89dd983500.jpg?v=1684520565"
-  //     ],
-  //     name: 'Sun Glass',
-  //     price: 350000,
-  //     rating: '4.5',
-  //     colors: {
-  //       'red': '',
-  //       'white': '',
-  //     },
-  //     description: 'awebewiubewubewu',
-  //   ),
-  // ];
+  @override
+  Widget build(BuildContext context) {
+    return TabBarView(
+      children: [
+        CustomTabbarWidget(status: OrderStatus.waitingPayment.name),
+        CustomTabbarWidget(status: OrderStatus.packing.name),
+        CustomTabbarWidget(status: OrderStatus.delivering.name),
+        CustomTabbarWidget(status: OrderStatus.completed.name),
+        CustomTabbarWidget(status: OrderStatus.cancelled.name),
+      ],
+    );
+  }
+}
 
-  // static List<Order> orders = [
-  //   Order(
-  //     id: 1,
-  //     number: '23050001',
-  //     address: 'address',
-  //     time: '18.00',
-  //     status: 'On The Way',
-  //     grandTotal: products[0].price! * 1,
-  //     paymentMethod: 'shopeepay',
-  //     receiptNumber: 'JP294728293',
-  //     orderDetail: OrderDetail(
-  //       product: products[0],
-  //       qty: 1,
-  //       price: products[0].price!,
-  //       subTotal: products[0].price! * 1,
-  //     ),
-  //   ),
-  //   Order(
-  //     id: 2,
-  //     number: '23050043',
-  //     address: 'address',
-  //     time: '18.00',
-  //     status: 'Preparing',
-  //     paymentMethod: 'ovo',
-  //     grandTotal: products[0].price! * 1,
-  //     orderDetail: OrderDetail(
-  //       product: products[1],
-  //       qty: 1,
-  //       price: products[1].price!,
-  //       subTotal: products[1].price! * 1,
-  //     ),
-  //   ),
-  //   Order(
-  //     id: 4,
-  //     number: '23050012',
-  //     address: 'address',
-  //     time: '18.00',
-  //     status: 'Delivered',
-  //     paymentMethod: 'gopay',
-  //     grandTotal: products[0].price! * 1,
-  //     orderDetail: OrderDetail(
-  //       product: products[0],
-  //       qty: 1,
-  //       price: products[0].price!,
-  //       subTotal: products[0].price! * 1,
-  //     ),
-  //   ),
-  // ];
+class CustomTabbarWidget extends StatelessWidget {
+  final String status;
+  const CustomTabbarWidget({
+    Key? key,
+    required this.status,
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return EasyRefresh(
       onRefresh: () async {
-        await Provider.of<OrderProvider>(context, listen: false).getOrders();
+        await Provider.of<OrderProvider>(context, listen: false)
+            .getOrdersByStatus(status);
       },
       refreshOnStart: true,
       child: Consumer<OrderProvider>(
         builder: (context, value, child) {
           if (value.state == ConnectionState.active) {
-            return LoadingAnimationWidget.threeArchedCircle(
-              color: Colors.white,
-              size: 25,
+            return ListView(
+              children: [
+                LoadingAnimationWidget.threeArchedCircle(
+                  color: Colors.white,
+                  size: 25,
+                ),
+              ],
             );
           }
           if (value.orders == null || value.orders!.isEmpty) {
@@ -175,6 +132,7 @@ class Orderspage extends StatelessWidget {
                                     ),
                                     IconButton(
                                       onPressed: () async {
+                                        value.order = order;
                                         await getPaymentStatus(context, order);
                                       },
                                       icon: const Icon(Icons.refresh_rounded),
@@ -216,9 +174,9 @@ class Orderspage extends StatelessWidget {
         paymentStatus = 'Paid';
       } else if (transactStatus == 'pending' ||
           status['status_code'] == '404') {
-        paymentStatus = 'Pending, Tap To Pay Now';
+        paymentStatus = 'Pending';
       } else if (transactStatus == 'expire') {
-        paymentStatus = 'Payment code has been expired';
+        paymentStatus = 'Expired';
       } else if (transactStatus == 'cancel') {
         paymentStatus = 'Order has been cancelled';
       } else if (transactStatus == 'deny') {
