@@ -1,12 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:satria_optik/helper/user_helper.dart';
-import 'package:satria_optik/model/user.dart';
-import 'package:satria_optik/provider/auth_provider.dart';
-import 'package:satria_optik/provider/user_provider.dart';
-import 'package:satria_optik/screen/home/home_navigation_controller.dart';
-import 'package:satria_optik/utils/common_widget.dart';
+
+import '../../provider/auth_provider.dart';
+import '../../provider/user_provider.dart';
+import '../../utils/common_widget.dart';
 
 class RegisterPage extends StatelessWidget {
   final TextEditingController nameController = TextEditingController();

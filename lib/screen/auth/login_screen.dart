@@ -136,9 +136,10 @@ class LoginPage extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 10),
-                      Consumer<AuthProvider>(
-                        builder: (context, value, child) => ElevatedButton.icon(
-                          onPressed: value.isTosApproved
+                      Consumer2<AuthProvider, UserProvider>(
+                        builder: (context, auth, user, child) =>
+                            ElevatedButton.icon(
+                          onPressed: auth.isTosApproved
                               ? () async {
                                   showDialog(
                                     context: context,
@@ -149,11 +150,13 @@ class LoginPage extends StatelessWidget {
                                     },
                                   );
                                   try {
-                                    await value.signWithGoogle().then(
-                                      (value) {
-                                        Navigator.of(context)
-                                            .pushReplacementNamed(
-                                                HomeNavigation.routeName);
+                                    await auth.signWithGoogle().then(
+                                      (value) async {
+                                        await user.getUser().then((value) {
+                                          Navigator.of(context)
+                                              .pushReplacementNamed(
+                                                  HomeNavigation.routeName);
+                                        });
                                       },
                                     );
                                   } catch (e) {
