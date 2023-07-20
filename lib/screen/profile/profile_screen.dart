@@ -84,6 +84,7 @@ class ProfilePage extends StatelessWidget {
             ],
           ),
         ),
+        const SizedBox(height: 10),
         const Text('Change Your Information Here'),
         const SizedBox(height: 10),
         Card(
