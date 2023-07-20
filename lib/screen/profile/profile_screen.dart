@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -5,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:satria_optik/provider/user_provider.dart';
 import 'package:satria_optik/screen/auth/login_screen.dart';
 import 'package:satria_optik/screen/profile/address/address_screen.dart';
+import 'package:satria_optik/screen/profile/avatar_screen.dart';
 
 import '../../helper/user_helper.dart';
 import 'change_profile_detail.dart';
@@ -15,31 +18,43 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String heroTag = 'user';
     return ListView(
       padding: const EdgeInsets.symmetric(vertical: 10),
       children: [
         Card(
           child: Row(
             children: [
-              Consumer<UserProvider>(
-                builder: (context, value, child) => SizedBox(
-                  height: 100,
-                  child: value.userProfile?.avatarPath != null &&
-                          value.userProfile!.avatarPath!.isNotEmpty
-                      ? Image.network(
-                          value.userProfile!.avatarPath!,
-                          width: 100,
-                          errorBuilder: (context, error, stackTrace) {
-                            return const Icon(
+              InkWell(
+                onTap: () {
+                  Navigator.of(context).pushNamed(
+                    AvatarPage.routeName,
+                    arguments: heroTag,
+                  );
+                },
+                child: Consumer<UserProvider>(
+                  builder: (context, value, child) => Hero(
+                    tag: heroTag,
+                    child: SizedBox(
+                      height: 100,
+                      width: 100,
+                      child: value.userProfile?.avatarPath != null &&
+                              value.userProfile!.avatarPath!.isNotEmpty
+                          ? CircleAvatar(
+                              backgroundColor: Colors.white,
+                              onBackgroundImageError:
+                                  (exception, stackTrace) {},
+                              backgroundImage: MemoryImage(
+                                File(value.userProfile!.image!.path)
+                                    .readAsBytesSync(),
+                              ),
+                            )
+                          : const Icon(
                               Icons.person_rounded,
                               size: 100,
-                            );
-                          },
-                        )
-                      : const Icon(
-                          Icons.person_rounded,
-                          size: 100,
-                        ),
+                            ),
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(width: 20),

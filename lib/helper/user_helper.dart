@@ -1,12 +1,13 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:provider/provider.dart';
-import 'package:satria_optik/helper/firestore_helper.dart';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 
 import '../model/user.dart';
-import '../provider/user_provider.dart';
+import 'firestore_helper.dart';
 
 class UserHelper extends FirestoreHelper {
   Future createUser(UserProfile user, String uid) async {
@@ -17,31 +18,53 @@ class UserHelper extends FirestoreHelper {
         .onError((error, stackTrace) => throw '$error');
   }
 
-  Future<Map<String, dynamic>> getUser(String uid) async {
-    Map<String, dynamic> data = {};
-    await db.collection('users').doc(uid).get().then((value) {
-      data = value.data()!;
-    });
-    return data;
+  Future<UserProfile> getUserProfile() async {
+    try {
+      var userData = UserProfile();
+      final docRef = FirebaseFirestore.instance.collection("users").doc(userID);
+      var data = await docRef.get();
+      var user = data.data();
+
+      if (user?['avatarPath'] != null) {
+        var response = await http.get(Uri.parse(user?['avatarPath']));
+        var directory = await getTemporaryDirectory();
+        var file = File('${directory.path}/image.jpg');
+        await file.writeAsBytes(response.bodyBytes);
+        user?['image'] = file;
+      }
+      userData = UserProfile.fromMap(user!);
+      return userData;
+    } catch (e) {
+      throw 'errror $e';
+    }
   }
 
-  Future<String> updateUser(
-      Map<String, dynamic> data, BuildContext context) async {
-    String returnData = '';
-    var userRef = db.collection('users').doc(userID);
-    await userRef.update(data).then((value) async {
-      var profile = await getUser(userID!);
+  Future updateUser(Map<String, dynamic> data) async {
+    try {
+      var userRef = db.collection('users').doc(userID);
+      await userRef.update(data);
+    } catch (e) {
+      throw "Error updating document, $e";
+    }
+  }
 
-      if (context.mounted) {
-        Provider.of<UserProvider>(context, listen: false).saveUser(
-          UserProfile.fromMap(profile),
-        );
+  Future<String?> updateAvatar(File avatar) async {
+    print('uploading');
+    try {
+      var userRef = db.collection('users').doc(userID);
+      String? imageUrl;
+      if (avatar.existsSync()) {
+        var avatarRef = storageRef.child('avatar/').child('$userID');
+        var snapshot = await avatarRef.putFile(avatar);
+        imageUrl = await snapshot.ref.getDownloadURL();
+        await userRef.update({'avatarPath': imageUrl});
       }
-      returnData = "Data successfully updated!";
-    }, onError: (e) {
-      throw "Error updating document $e";
-    });
-    return returnData;
+      print('uploaded');
+      print(imageUrl);
+      return imageUrl;
+    } catch (e) {
+      throw 'Error updating your avatar, $e';
+    }
   }
 
   Future connectWithGoogle() async {

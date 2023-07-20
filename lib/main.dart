@@ -1,6 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:satria_optik/provider/auth_provider.dart';
+import 'package:satria_optik/screen/auth/tos_screen.dart';
+import 'package:satria_optik/screen/profile/avatar_screen.dart';
 
 import 'firebase_options.dart';
 import 'model/address.dart';
@@ -59,6 +62,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (context) => AuthProvider()),
         ChangeNotifierProvider(create: (context) => UserProvider()),
         ChangeNotifierProvider(create: (context) => FrameProvider()),
         ChangeNotifierProvider(create: (context) => LensProvider()),
@@ -74,7 +78,8 @@ class MyApp extends StatelessWidget {
         theme: CustomTheme.customTheme,
         home: const SplashPage(),
         routes: {
-          LoginPage.routeName: (context) => LoginPage(),
+          LoginPage.routeName: (context) => const LoginPage(),
+          TOSPage.routeName: (context) => const TOSPage(),
           ProfilePage.routeName: (context) => const ProfilePage(),
           CartPage.routeName: (context) => const CartPage(),
           ConversationPage.routeName: (context) => const ConversationPage(),
@@ -91,6 +96,11 @@ class MyApp extends StatelessWidget {
             final args = settings.arguments as int?;
             return MaterialPageRoute(
               builder: (context) => HomeNavigation(index: args),
+            );
+          } else if (settings.name == AvatarPage.routeName) {
+            final args = settings.arguments as String;
+            return MaterialPageRoute(
+              builder: (context) => AvatarPage(heroTag: args),
             );
           } else if (settings.name == PromotionPage.routeName) {
             final args = settings.arguments as Map<String, dynamic>;
@@ -136,13 +146,6 @@ class MyApp extends StatelessWidget {
                 );
               },
             );
-            // } else if (settings.name == OrderDetailPage.routeName) {
-            //   final args = settings.arguments as Transactions;
-            //   return MaterialPageRoute(
-            //     builder: (context) {
-            //       return OrderDetailPage(order: args);
-            //     },
-            //   );
           } else if (settings.name == NewAddressPage.routeName) {
             final args = settings.arguments as Address?;
             return MaterialPageRoute(
