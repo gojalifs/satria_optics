@@ -106,7 +106,9 @@ class AvatarPage extends StatelessWidget {
                 else
                   ElevatedButton(
                     onPressed: () async {
-                      await userProv.updateAvatar();
+                      await userProv.updateAvatar().then((value) {
+                        Navigator.of(context).pop();
+                      });
                     },
                     child: const Text('Save My Avatar'),
                   ),
