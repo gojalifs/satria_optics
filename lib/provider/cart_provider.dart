@@ -12,7 +12,7 @@ class CartProvider extends ChangeNotifier {
   bool _isUpdate = false;
 
   List<Cart>? _carts = [];
-  List<Cart>? _checkouts = [];
+  final List<Cart> _checkouts = [];
 
   double? _totalPrice = 0;
 
@@ -33,18 +33,18 @@ class CartProvider extends ChangeNotifier {
   }
 
   addCheckouts(Cart cart) {
-    _checkouts?.add(cart);
+    _checkouts.add(cart);
     notifyListeners();
   }
 
   removeCheckouts(Cart cart) {
-    _checkouts?.remove(cart);
+    _checkouts.remove(cart);
   }
 
   Future getCarts() async {
-    if (_carts!.isNotEmpty || _checkouts!.isNotEmpty) {
+    if (_carts!.isNotEmpty || _checkouts.isNotEmpty) {
       _carts!.clear();
-      _checkouts!.clear();
+      _checkouts.clear();
       _totalPrice = 0;
     }
     _state = ConnectionState.active;

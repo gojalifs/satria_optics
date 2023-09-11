@@ -45,6 +45,7 @@ class LoginPage extends StatelessWidget {
                       TextFormField(
                         controller: emailController,
                         textInputAction: TextInputAction.next,
+                        autofillHints: const [AutofillHints.email],
                         decoration: const InputDecoration(
                           labelText: 'Email',
                         ),
@@ -60,6 +61,7 @@ class LoginPage extends StatelessWidget {
                       TextFormField(
                         controller: passController,
                         textInputAction: TextInputAction.done,
+                        autofillHints: const [AutofillHints.password],
                         decoration: const InputDecoration(
                           labelText: 'Password',
                         ),
@@ -89,31 +91,33 @@ class LoginPage extends StatelessWidget {
                                 value: authProv.isTosApproved,
                                 onChanged: (value) {
                                   authProv.tosValue = !authProv.isTosApproved;
-                                  print(authProv.isTosApproved);
                                 },
                               );
                             },
                           ),
-                          RichText(
-                            text: TextSpan(
-                              children: [
-                                const TextSpan(
-                                  text: 'By logging in, you accept our ',
-                                ),
-                                TextSpan(
-                                  text: 'Term And Privacy Policy',
-                                  style: const TextStyle(
-                                    color: Colors.blue,
-                                    decoration: TextDecoration.underline,
+                          Expanded(
+                            child: RichText(
+                              text: TextSpan(
+                                children: [
+                                  const TextSpan(
+                                    text: 'By logging in, you accept our ',
                                   ),
-                                  // Add an onTap function to handle the button tap
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () {
-                                      Navigator.of(context)
-                                          .pushNamed(TOSPage.routeName);
-                                    },
-                                ),
-                              ],
+                                  TextSpan(
+                                    text: 'Term And Privacy Policy',
+                                    style: TextStyle(
+                                      color:
+                                          Theme.of(context).primaryColorLight,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                    // Add an onTap function to handle the button tap
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () {
+                                        Navigator.of(context)
+                                            .pushNamed(TOSPage.routeName);
+                                      },
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
@@ -178,7 +182,7 @@ class LoginPage extends StatelessWidget {
                         onPressed: () {
                           Navigator.pushNamed(context, RegisterPage.routeName);
                         },
-                        child: const Text('Don\'t have an account? Register'),
+                        child: const Text("Don't have an account? Register"),
                       ),
                     ],
                   ),
@@ -227,7 +231,7 @@ class LoginWithPassword extends StatelessWidget {
                       (value) {
                         if (context.mounted) {
                           Provider.of<UserProvider>(context, listen: false)
-                              .getUser();
+                              .getUser(value.user?.uid);
                           Navigator.of(context)
                               .pushReplacementNamed(HomeNavigation.routeName);
                         }
@@ -241,6 +245,10 @@ class LoginWithPassword extends StatelessWidget {
                       ),
                     );
                   } catch (e) {
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('$e')),
+                    );
                     debugPrint('$e');
                   }
                 }

@@ -1,11 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:satria_optik/helper/user_helper.dart';
-import 'package:satria_optik/model/user.dart';
 import 'package:satria_optik/provider/auth_provider.dart';
 import 'package:satria_optik/provider/user_provider.dart';
-import 'package:satria_optik/screen/home/home_navigation_controller.dart';
 import 'package:satria_optik/utils/common_widget.dart';
 
 class RegisterPage extends StatelessWidget {
@@ -75,7 +71,7 @@ class RegisterPage extends StatelessWidget {
                       Consumer2<AuthProvider, UserProvider>(
                         builder: (context, auth, user, child) => ElevatedButton(
                           onPressed: () async {
-                            await auth.registerWithEmail(
+                            var credential = await auth.registerWithEmail(
                               nameController.text.trim(),
                               emailController.text.trim(),
                               phoneController.text.trim(),
@@ -84,7 +80,7 @@ class RegisterPage extends StatelessWidget {
                               genderController.text.trim(),
                             );
                             if (context.mounted) {
-                              await user.getUser();
+                              await user.getUser(credential.user?.uid);
                             }
                           },
                           child: const Text('REGISTER'),

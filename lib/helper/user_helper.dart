@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -18,25 +19,33 @@ class UserHelper extends FirestoreHelper {
         .onError((error, stackTrace) => throw '$error');
   }
 
-  Future<UserProfile> getUserProfile() async {
-    try {
-      var userData = UserProfile();
-      final docRef = FirebaseFirestore.instance.collection("users").doc(userID);
-      var data = await docRef.get();
-      var user = data.data();
+  Future<UserProfile?> getUserProfile(String? uid) async {
+    // try {
+    var userData = UserProfile();
+    DocumentReference<Map<String, dynamic>> docRef;
 
-      if (user?['avatarPath'] != null) {
-        var response = await http.get(Uri.parse(user?['avatarPath']));
-        var directory = await getTemporaryDirectory();
-        var file = File('${directory.path}/image.jpg');
-        await file.writeAsBytes(response.bodyBytes);
-        user?['image'] = file;
-      }
-      userData = UserProfile.fromMap(user!);
-      return userData;
-    } catch (e) {
-      throw 'errror $e';
+    docRef = FirebaseFirestore.instance.collection("users").doc(uid);
+    if (uid == null) {
+      return null;
     }
+
+    var data = await docRef.get();
+    var dataMap = data.data();
+
+    if (dataMap?['avatarPath'] != null) {
+      var response = await http.get(Uri.parse(dataMap?['avatarPath']));
+      var directory = await getTemporaryDirectory();
+      var file = File('${directory.path}/image.jpg');
+      await file.writeAsBytes(response.bodyBytes);
+      dataMap?['image'] = file;
+    }
+
+    userData = UserProfile.fromMap(dataMap!);
+    return userData;
+    // } catch (e, s) {
+    //   print(s);
+    //   throw 'errror $e';
+    // }
   }
 
   Future updateUser(Map<String, dynamic> data) async {
@@ -49,7 +58,6 @@ class UserHelper extends FirestoreHelper {
   }
 
   Future<String?> updateAvatar(File avatar) async {
-    print('uploading');
     try {
       var userRef = db.collection('users').doc(userID);
       String? imageUrl;
@@ -59,8 +67,6 @@ class UserHelper extends FirestoreHelper {
         imageUrl = await snapshot.ref.getDownloadURL();
         await userRef.update({'avatarPath': imageUrl});
       }
-      print('uploaded');
-      print(imageUrl);
       return imageUrl;
     } catch (e) {
       throw 'Error updating your avatar, $e';
