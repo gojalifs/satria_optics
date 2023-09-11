@@ -14,7 +14,7 @@ class GlassFrame {
   final String? shape;
   final String? gender;
   final String? material;
-  final Map<String, dynamic>? colors;
+  final List<ColorVariant>? colors;
 
   GlassFrame({
     this.id,
@@ -49,19 +49,29 @@ class GlassFrame {
   }
 
   factory GlassFrame.fromMap(Map<String, dynamic> map) {
+    List<ColorVariant> colorVariants = [];
+    (map['colors'] as Map).forEach((key, value) {
+      colorVariants.add(
+        ColorVariant(
+          name: key,
+          qty: value['qty'],
+          url: value['url'],
+        ),
+      );
+    });
     return GlassFrame(
       id: map['id'],
       favoritedBy: map['favoritedBy'],
       imageUrl: List<String>.from(map['imageUrl']),
       name: map['name'],
       price: map['price']?.toInt(),
-      rating: map['rating'].toString(),
+      rating: map['rating'],
       description: map['description'],
       type: map['type'],
       shape: map['shape'],
       gender: map['gender'],
       material: map['material'],
-      colors: Map<String, dynamic>.from(map['colors']),
+      colors: colorVariants,
     );
   }
 
@@ -70,37 +80,9 @@ class GlassFrame {
   factory GlassFrame.fromJson(String source) =>
       GlassFrame.fromMap(json.decode(source));
 
-  GlassFrame copyWith({
-    String? id,
-    List<String>? imageUrl,
-    String? name,
-    int? price,
-    String? rating,
-    String? description,
-    String? type,
-    String? shape,
-    String? gender,
-    String? material,
-    Map<String, dynamic>? colors,
-  }) {
-    return GlassFrame(
-      id: id ?? this.id,
-      imageUrl: imageUrl ?? this.imageUrl,
-      name: name ?? this.name,
-      price: price ?? this.price,
-      rating: rating ?? this.rating,
-      description: description ?? this.description,
-      type: type ?? this.type,
-      shape: shape ?? this.shape,
-      gender: gender ?? this.gender,
-      material: material ?? this.material,
-      colors: colors ?? this.colors,
-    );
-  }
-
   @override
   String toString() {
-    return 'GlassFrame(id: $id, imageUrl: $imageUrl, name: $name, price: $price, rating: $rating, description: $description, type: $type, shape: $shape, gender: $gender, material: $material, colors: $colors)';
+    return 'GlassFrame(id: $id, favoritedBy: $favoritedBy, imageUrl: $imageUrl, name: $name, price: $price, rating: $rating, description: $description, type: $type, shape: $shape, gender: $gender, material: $material, colors: $colors)';
   }
 
   @override
@@ -119,7 +101,7 @@ class GlassFrame {
         other.shape == shape &&
         other.gender == gender &&
         other.material == material &&
-        mapEquals(other.colors, colors);
+        listEquals(other.colors, colors);
   }
 
   @override
@@ -137,4 +119,95 @@ class GlassFrame {
         material.hashCode ^
         colors.hashCode;
   }
+
+  GlassFrame copyWith({
+    String? id,
+    bool? favoritedBy,
+    List<String>? imageUrl,
+    String? name,
+    int? price,
+    String? rating,
+    String? description,
+    String? type,
+    String? shape,
+    String? gender,
+    String? material,
+    List<ColorVariant>? colors,
+  }) {
+    return GlassFrame(
+      id: id ?? this.id,
+      favoritedBy: favoritedBy ?? this.favoritedBy,
+      imageUrl: imageUrl ?? this.imageUrl,
+      name: name ?? this.name,
+      price: price ?? this.price,
+      rating: rating ?? this.rating,
+      description: description ?? this.description,
+      type: type ?? this.type,
+      shape: shape ?? this.shape,
+      gender: gender ?? this.gender,
+      material: material ?? this.material,
+      colors: colors ?? this.colors,
+    );
+  }
+}
+
+class ColorVariant {
+  final String? name;
+  final String? qty;
+  final String? url;
+
+  ColorVariant({
+    this.name,
+    this.qty,
+    this.url,
+  });
+
+  ColorVariant copyWith({
+    String? name,
+    String? qty,
+    String? url,
+  }) {
+    return ColorVariant(
+      name: name ?? this.name,
+      qty: qty ?? this.qty,
+      url: url ?? this.url,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'qty': qty,
+      'url': url,
+    };
+  }
+
+  factory ColorVariant.fromMap(Map<String, dynamic> map) {
+    return ColorVariant(
+      name: map['name'],
+      qty: map['qty'],
+      url: map['url'],
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory ColorVariant.fromJson(String source) =>
+      ColorVariant.fromMap(json.decode(source));
+
+  @override
+  String toString() => 'ColorVariant(name: $name, qty: $qty, url: $url)';
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is ColorVariant &&
+        other.name == name &&
+        other.qty == qty &&
+        other.url == url;
+  }
+
+  @override
+  int get hashCode => name.hashCode ^ qty.hashCode ^ url.hashCode;
 }

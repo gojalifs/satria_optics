@@ -98,7 +98,7 @@ class CartPage extends StatelessWidget {
                               ),
                               const SizedBox(width: 10),
                               Image.network(
-                                cart.product.colors![cart.color],
+                                cart.product.colors![0].url!,
                                 width: 75,
                                 errorBuilder: (context, error, stackTrace) {
                                   return const Icon(Icons.image_rounded);
@@ -180,8 +180,8 @@ class CartPage extends StatelessWidget {
                                     const EdgeInsets.symmetric(horizontal: 10),
                                 child: ProductDetailBottomSheet(
                                   frame: cart.product,
-                                  colorName: cart.product.colors!.keys
-                                      .map((e) => e.toString())
+                                  colorName: cart.product.colors!
+                                      .map((e) => e.name!)
                                       .toList(),
                                   page: 'cart',
                                   cart: cart,

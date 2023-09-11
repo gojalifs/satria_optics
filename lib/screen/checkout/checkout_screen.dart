@@ -142,7 +142,7 @@ class CheckoutPage extends StatelessWidget {
                           Row(
                             children: [
                               Image.network(
-                                cart.product.colors![cart.color],
+                                cart.product.colors![0].url!,
                                 width: 100,
                                 height: 100,
                               ),

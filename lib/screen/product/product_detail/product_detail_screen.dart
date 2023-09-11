@@ -45,10 +45,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     });
     Provider.of<LensProvider>(context, listen: false).getLens();
 
-    frameColorsName = widget.glassFrame.colors?.keys.toList() ?? [];
+    frameColorsName =
+        widget.glassFrame.colors?.map((e) => e.name ?? '').toList() ?? [];
     frameColorImages =
-        widget.glassFrame.colors?.values.map((e) => e.toString()).toList() ??
-            [];
+        widget.glassFrame.colors?.map((e) => e.url ?? '').toList() ?? [];
+
     frameImages.addAll(widget.glassFrame.imageUrl ?? []);
     frameImages.addAll(frameColorImages);
 
