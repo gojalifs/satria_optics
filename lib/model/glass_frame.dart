@@ -32,6 +32,11 @@ class GlassFrame {
   });
 
   Map<String, dynamic> toMap() {
+    Map<String, Map<String, dynamic>> color1 = {};
+    for (var element in colors!) {
+      color1[element.name!] = element.toMap();
+    }
+
     return {
       'id': id,
       'favoritedBy': favoritedBy,
@@ -44,7 +49,7 @@ class GlassFrame {
       'shape': shape,
       'gender': gender,
       'material': material,
-      'colors': colors,
+      'colors': color1,
     };
   }
 
