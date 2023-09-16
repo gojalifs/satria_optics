@@ -166,11 +166,12 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         ),
                       ],
                     ),
-                    Consumer2<FavoriteProvider, FrameProvider>(
-                      builder: (context, favProv, frameProv, child) {
+                    Consumer<FavoriteProvider>(
+                      builder: (context, favProv, child) {
                         return IconButton(
                           iconSize: 30,
-                          color: (frameProv.frame!.favoritedBy ?? false)
+                          color: (favProv.favFramesId
+                                  .contains(widget.glassFrame.id))
                               ? Colors.red
                               : Colors.white,
                           onPressed: () async {
@@ -185,29 +186,25 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                           color: Colors.white, size: 25);
                                 },
                               );
-                              if (frameProv.frame!.favoritedBy!) {
-                                await favProv.removeFavorite(frame);
-                                if (!mounted) {
-                                  return;
-                                }
-                                frameProv.frame!.favoritedBy = false;
-                                Navigator.of(context).pop();
+
+                              bool isAddFavorite = await favProv
+                                  .updateFavorite(widget.glassFrame.id!);
+
+                              if (!mounted) {
+                                return;
+                              }
+                              Navigator.of(context).pop();
+                              if (isAddFavorite) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text('Removed from favorite'),
+                                    content: Text('Added to favorites'),
                                     duration: Duration(seconds: 2),
                                   ),
                                 );
                               } else {
-                                await favProv.addFavorite(frame);
-                                if (!mounted) {
-                                  return;
-                                }
-                                frameProv.frame!.favoritedBy = true;
-                                Navigator.of(context).pop();
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text('Added to favorites'),
+                                    content: Text('Removed from favorites'),
                                     duration: Duration(seconds: 2),
                                   ),
                                 );

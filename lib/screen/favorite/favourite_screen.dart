@@ -11,7 +11,7 @@ class FavouritePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<FavoriteProvider>(context, listen: false).getFavs();
+    Provider.of<FavoriteProvider>(context, listen: false).getFavProducts();
     return Consumer<FavoriteProvider>(
       builder: (context, favProv, child) {
         if (favProv.state == ConnectionState.active) {
@@ -20,24 +20,24 @@ class FavouritePage extends StatelessWidget {
                 color: Colors.white, size: 25),
           );
         }
-        if (favProv.favFrames!.isEmpty) {
+        if (favProv.favFramesId.isEmpty) {
           return const Center(
             child: Text("You don't have any favorite. Try looking some glass"),
           );
         }
         return ListView.builder(
-          itemCount: favProv.favFrames?.length,
+          itemCount: favProv.favFramesId.length,
           itemBuilder: (context, index) {
             return InkWell(
               onTap: () {
                 Navigator.pushNamed(
                   context,
                   ProductDetailPage.routeName,
-                  arguments: favProv.favFrames?[index],
+                  arguments: favProv.favFramesId[index],
                 );
               },
               child: _FavouriteCard(
-                products: favProv.favFrames!,
+                products: favProv.favFrames,
                 index: index,
               ),
             );
@@ -82,7 +82,7 @@ class _FavouriteCard extends StatelessWidget {
               builder: (context, value, child) => IconButton(
                 onPressed: () async {
                   try {
-                    await value.removeFavorite(products[index]);
+                    await value.updateFavorite(products[index].id!);
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(

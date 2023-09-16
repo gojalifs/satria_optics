@@ -1,48 +1,64 @@
 import 'package:flutter/material.dart';
 import 'package:satria_optik/helper/favorite_helper.dart';
-import 'package:satria_optik/model/favorite.dart';
 import 'package:satria_optik/model/glass_frame.dart';
 
 class FavoriteProvider extends ChangeNotifier {
   final FavoriteHelper _helper = FavoriteHelper();
   ConnectionState _state = ConnectionState.none;
 
-  List<GlassFrame>? _favFrames = [];
+  List<String> _favFramesId = [];
+  List<GlassFrame> _favFrames = [];
 
   ConnectionState get state => _state;
-  List<GlassFrame>? get favFrames => _favFrames;
+  List<String> get favFramesId => _favFramesId;
+  List<GlassFrame> get favFrames => _favFrames;
 
   Future getFavs() async {
-    if (favFrames!.isNotEmpty) {
-      _favFrames!.clear();
+    if (_favFramesId.isNotEmpty) {
+      _favFramesId.clear();
     }
     _state = ConnectionState.active;
-    List<Favorite>? result = await _helper.getFavorites();
-
-    _favFrames = result.map((e) => e.frame!).toList();
+    _favFramesId = await _helper.getFavoritesId();
 
     _state = ConnectionState.done;
 
     notifyListeners();
   }
 
-  Future<bool> addFavorite(GlassFrame frame) async {
+  Future getFavProducts() async {
+    _state = ConnectionState.active;
     try {
-      await _helper.addToFavorite(frame.id!);
-      notifyListeners();
-      return true;
+      if (_favFramesId.isEmpty) {
+        _favFramesId = await _helper.getFavoritesId();
+      }
+      print(_favFramesId);
+      _favFrames = await _helper.getFavoritesFrame(_favFramesId);
     } catch (e) {
       rethrow;
+    } finally {
+      _state = ConnectionState.done;
+      notifyListeners();
     }
   }
 
-  Future removeFavorite(GlassFrame frame) async {
+  Future<bool> updateFavorite(String frameId) async {
+    _state = ConnectionState.active;
+    bool isAdd = true;
     try {
-      await _helper.removeFromFavorite(frame.id!);
-      _favFrames?.remove(frame);
-      notifyListeners();
+      if (_favFramesId.contains(frameId)) {
+        _favFramesId.remove(frameId);
+        isAdd = false;
+      } else {
+        _favFramesId.add(frameId);
+      }
+
+      await _helper.updateFavorite(_favFramesId);
+      return isAdd;
     } catch (e) {
       rethrow;
+    } finally {
+      _state = ConnectionState.done;
+      notifyListeners();
     }
   }
 }

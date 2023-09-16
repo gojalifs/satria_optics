@@ -10,6 +10,7 @@ class UserProfile {
   final String? birth;
   final String? gender;
   final String? avatarPath;
+  final List? favorites;
   final File? image;
 
   UserProfile({
@@ -21,6 +22,7 @@ class UserProfile {
     this.birth = '',
     this.gender = '',
     this.avatarPath = '',
+    this.favorites,
     this.image,
   });
 
@@ -34,6 +36,7 @@ class UserProfile {
       'birth': birth,
       'gender': gender,
       'avatarPath': avatarPath,
+      'favorites': favorites,
       'image': image,
     };
   }
@@ -48,6 +51,7 @@ class UserProfile {
       birth: map['birth'],
       gender: map['gender'],
       avatarPath: map['avatarPath'],
+      favorites: map['favorites'],
       image: map['image'],
     );
   }
@@ -66,6 +70,7 @@ class UserProfile {
     String? birth,
     String? gender,
     String? avatarPath,
+    List<String>? favorites,
     File? image,
   }) {
     return UserProfile(
@@ -77,13 +82,14 @@ class UserProfile {
       birth: birth ?? this.birth,
       gender: gender ?? this.gender,
       avatarPath: avatarPath ?? this.avatarPath,
+      favorites: favorites ?? this.favorites,
       image: image ?? this.image,
     );
   }
 
   @override
   String toString() {
-    return 'UserProfile(id: $id, name: $name, username: $username, email: $email, phone: $phone, birth: $birth, gender: $gender, avatarPath: $avatarPath, image: $image)';
+    return 'UserProfile(id: $id, name: $name, username: $username, email: $email, phone: $phone, birth: $birth, gender: $gender, avatarPath: $avatarPath, favorites: $favorites, image: $image)';
   }
 
   @override
@@ -99,6 +105,7 @@ class UserProfile {
         other.birth == birth &&
         other.gender == gender &&
         other.avatarPath == avatarPath &&
+        other.favorites == favorites &&
         other.image == image;
   }
 
@@ -111,6 +118,7 @@ class UserProfile {
         phone.hashCode ^
         birth.hashCode ^
         gender.hashCode ^
+        favorites.hashCode ^
         avatarPath.hashCode ^
         image.hashCode;
   }

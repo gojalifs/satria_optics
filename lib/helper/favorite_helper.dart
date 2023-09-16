@@ -1,49 +1,48 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:satria_optik/helper/firestore_helper.dart';
-import 'package:satria_optik/helper/frame_helper.dart';
-import 'package:satria_optik/model/favorite.dart';
+import 'package:satria_optik/model/glass_frame.dart';
 
 class FavoriteHelper extends FirestoreHelper {
-  Future<List<Favorite>> getFavorites() async {
-    List<Favorite> favs = [];
+  Future<List<String>> getFavoritesId() async {
+    try {
+      final userRef = db.collection('users').doc(userID);
 
-    final favRef =
-        db.collection("products").where("favoritedBy.$userID", isEqualTo: true);
-    var favorites = await favRef.get();
-    FrameHelper frameHelper = FrameHelper();
-    for (var element in favorites.docs) {
-      var favFrame = await frameHelper.getFrame(element.id);
+      var user = await userRef.get();
+      var userData = user.data();
+      var favData =
+          (userData?['favorites'] as List).map((e) => e.toString()).toList();
 
-      favs.add(Favorite.fromFirestore(
-        element,
-        favFrame,
-      ));
+      return favData;
+    } catch (e, s) {
+      debugPrint(s.toString());
+      throw 'Error Happened. . .';
+    }
+  }
+
+  Future<List<GlassFrame>> getFavoritesFrame(List<String> favsId) async {
+    // try {
+    List<GlassFrame> favs = [];
+    final ref = db.collection('products');
+    var data = await ref.where(FieldPath.documentId, whereIn: favsId).get();
+
+    for (var element in data.docs) {
+      var frame = element.data();
+      favs.add(GlassFrame.fromMap(frame));
     }
 
     return favs;
+    // } catch (e) {
+    //   throw 'Error Happened. . .';
+    // }
   }
 
-  Future<bool> addToFavorite(String frameId) async {
+  Future<bool> updateFavorite(List<String> favorites) async {
     try {
-      final favRef = db.collection('products').doc(frameId);
-      await favRef.set(
+      final ref = db.collection('users').doc(userID);
+      await ref.set(
         {
-          'favoritedBy': {userID: true},
-        },
-        SetOptions(merge: true),
-      );
-      return true;
-    } catch (e) {
-      throw 'Something error happened';
-    }
-  }
-
-  Future removeFromFavorite(String frameId) async {
-    try {
-      final favRef = db.collection('products').doc(frameId);
-      await favRef.set(
-        {
-          'favoritedBy': {userID: false},
+          'favorites': favorites,
         },
         SetOptions(merge: true),
       );
