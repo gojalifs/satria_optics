@@ -171,7 +171,7 @@ class _LoginPageState extends State<LoginPage> {
                                     },
                                   );
                                   try {
-                                    await value.signWithGoogle().then(
+                                    await auth.signWithGoogle().then(
                                       (value) {
                                         Navigator.of(context)
                                             .pushNamedAndRemoveUntil(
