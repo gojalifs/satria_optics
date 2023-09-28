@@ -1,3 +1,4 @@
+import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
@@ -11,7 +12,6 @@ class FavouritePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<FavoriteProvider>(context, listen: false).getFavs();
     return Consumer<FavoriteProvider>(
       builder: (context, favProv, child) {
         if (favProv.state == ConnectionState.active) {
@@ -20,28 +20,36 @@ class FavouritePage extends StatelessWidget {
                 color: Colors.white, size: 25),
           );
         }
-        if (favProv.favFrames!.isEmpty) {
+        if (favProv.favFramesId.isEmpty) {
           return const Center(
             child: Text("You don't have any favorite. Try looking some glass"),
           );
         }
-        return ListView.builder(
-          itemCount: favProv.favFrames?.length,
-          itemBuilder: (context, index) {
-            return InkWell(
-              onTap: () {
-                Navigator.pushNamed(
-                  context,
-                  ProductDetailPage.routeName,
-                  arguments: favProv.favFrames?[index],
-                );
-              },
-              child: _FavouriteCard(
-                products: favProv.favFrames!,
-                index: index,
-              ),
-            );
+        return EasyRefresh(
+          onRefresh: () {
+            Provider.of<FavoriteProvider>(context, listen: false)
+                .getFavProducts();
           },
+          refreshOnStart: favProv.favFrames.isEmpty ? true : false,
+          child: ListView.builder(
+            itemCount: favProv.favFramesId.length,
+            itemBuilder: (context, index) {
+              return InkWell(
+                onTap: () {
+                  print(favProv.favFrames[index]);
+                  Navigator.pushNamed(
+                    context,
+                    ProductDetailPage.routeName,
+                    arguments: favProv.favFrames[index],
+                  );
+                },
+                child: _FavouriteCard(
+                  products: favProv.favFrames,
+                  index: index,
+                ),
+              );
+            },
+          ),
         );
       },
     );
@@ -82,7 +90,7 @@ class _FavouriteCard extends StatelessWidget {
               builder: (context, value, child) => IconButton(
                 onPressed: () async {
                   try {
-                    await value.removeFavorite(products[index]);
+                    await value.updateFavorite(products[index].id!);
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(

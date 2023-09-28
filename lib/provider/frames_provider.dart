@@ -6,9 +6,9 @@ class FrameProvider extends ChangeNotifier {
   FrameHelper frameHelper = FrameHelper();
 
   GlassFrame? _frame = GlassFrame();
-  List<GlassFrame>? _frames = [];
-  List<String>? _frameColors = [];
-  List<String>? _frameColorImages = [];
+  final List<GlassFrame> _frames = [];
+  final List<String> _frameColors = [];
+  final List<String> _frameColorImages = [];
 
   GlassFrame? get frame => _frame;
   List<GlassFrame>? get frames => _frames;
@@ -17,11 +17,9 @@ class FrameProvider extends ChangeNotifier {
 
   Future getAllFrames() async {
     await frameHelper.getAllFrame().then((value) {
-      if (_frames != null) {
-        _frames!.clear();
-      }
+      _frames.clear();
       for (var frame in value) {
-        _frames!.add(frame);
+        _frames.add(frame);
       }
       notifyListeners();
     });

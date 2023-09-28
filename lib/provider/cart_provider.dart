@@ -11,13 +11,13 @@ class CartProvider extends ChangeNotifier {
 
   bool _isUpdate = false;
 
-  List<Cart>? _carts = [];
-  List<Cart>? _checkouts = [];
+  List<Cart> _carts = [];
+  final List<Cart> _checkouts = [];
 
   double? _totalPrice = 0;
 
-  List<Cart>? get carts => _carts;
-  List<Cart>? get checkouts => _checkouts;
+  List<Cart> get carts => _carts;
+  List<Cart> get checkouts => _checkouts;
   bool get isUpdate => _isUpdate;
   ConnectionState get state => _state;
   double? get totalPrice => _totalPrice;
@@ -33,18 +33,18 @@ class CartProvider extends ChangeNotifier {
   }
 
   addCheckouts(Cart cart) {
-    _checkouts?.add(cart);
+    _checkouts.add(cart);
     notifyListeners();
   }
 
   removeCheckouts(Cart cart) {
-    _checkouts?.remove(cart);
+    _checkouts.remove(cart);
   }
 
   Future getCarts() async {
-    if (_carts!.isNotEmpty || _checkouts!.isNotEmpty) {
-      _carts!.clear();
-      _checkouts!.clear();
+    if (_carts.isNotEmpty || _checkouts.isNotEmpty) {
+      _carts.clear();
+      _checkouts.clear();
       _totalPrice = 0;
     }
     _state = ConnectionState.active;
@@ -54,20 +54,21 @@ class CartProvider extends ChangeNotifier {
   }
 
   Future addToCart(Cart cart, File file) async {
+    _carts.add(cart);
     await cartHelper.addToCart(cart, file, _isUpdate);
     _isUpdate = false;
     notifyListeners();
   }
 
   Future getCart(Cart cart) async {
-    int position = _carts!.indexOf(cart);
-    _carts?[position] = await cartHelper.getCart(cart.id!);
+    int position = _carts.indexOf(cart);
+    _carts[position] = await cartHelper.getCart(cart.id!);
     notifyListeners();
   }
 
   Future removeFromCart(Cart cart) async {
     await cartHelper.removeFromCart(cart);
-    _carts?.remove(cart);
+    _carts.remove(cart);
     notifyListeners();
   }
 }

@@ -1,42 +1,60 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:satria_optik/provider/base_provider.dart';
 
 import '../helper/auth_helper.dart';
 
-class AuthProvider extends ChangeNotifier {
+class AuthProvider extends BaseProvider {
   final AuthHelper _authHelper = AuthHelper();
-  bool _isLoggedIn = false;
   bool _isTosApproved = false;
-  ConnectionState _state = ConnectionState.none;
 
-  bool get isLoggedIn => _isLoggedIn;
   bool get isTosApproved => _isTosApproved;
-  ConnectionState get state => _state;
 
   set tosValue(bool isApproved) {
     _isTosApproved = isApproved;
     notifyListeners();
   }
 
-  Future<bool> getLoginStatus() async {
-    _state = ConnectionState.active;
+  Future<String?> getLoginStatus() async {
+    state = ConnectionState.active;
 
     try {
-      _isLoggedIn = await _authHelper.getLoginStatus();
+      user = await _authHelper.getLoginStatus();
 
-      if (_isLoggedIn) {
-        return true;
+      if (user != null && user!.uid.isNotEmpty) {
+        return user?.uid;
       }
-      return false;
+      return null;
     } catch (e) {
       rethrow;
     } finally {
-      _state = ConnectionState.done;
+      state = ConnectionState.done;
       notifyListeners();
     }
   }
 
-  Future signWithPassword(String email, String pass) async {
-    await _authHelper.signInwithPass(email, pass);
+  Future<List<String>> checkLoginMethod(String email) async {
+    try {
+      var data = await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
+      return data;
+    } catch (e) {
+      throw 'Error Happened';
+    }
+  }
+
+  Future<UserCredential> signWithPassword(String email, String pass) async {
+    state = ConnectionState.active;
+    try {
+      var credential = await _authHelper.signInwithPass(email, pass);
+
+      return credential!;
+    } catch (e) {
+      rethrow;
+    } finally {
+      state = ConnectionState.done;
+      notifyListeners();
+    }
   }
 
   Future signWithGoogle() async {
@@ -47,13 +65,41 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future registerWithEmail(String name, String email, String phone,
-      String password, String birth, String gender) async {
+  Future<UserCredential> registerWithEmail(String name, String email,
+      String phone, String password, String birth, String gender) async {
     try {
-      await _authHelper.registerEmail(
+      return await _authHelper.registerEmail(
           name, email, phone, password, birth, gender);
     } catch (e) {
       throw 'Error while registering your account';
+    }
+  }
+
+  Future logout() async {
+    await GoogleSignIn().signOut();
+    await FirebaseAuth.instance.signOut();
+  }
+
+  Future unlinkGoogle() async {
+    state = ConnectionState.active;
+
+    try {
+      print(FirebaseAuth.instance.currentUser?.providerData.map((e) {
+        e.providerId;
+        return e.providerId;
+      }));
+      await FirebaseAuth.instance.currentUser?.unlink("google.com");
+      print('success');
+    } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        case "no-such-provider":
+          throw 'No Provider Found. If error still occured, please contact admin';
+        default:
+          throw 'Unknown Error';
+      }
+    } finally {
+      state = ConnectionState.done;
+      notifyListeners();
     }
   }
 }

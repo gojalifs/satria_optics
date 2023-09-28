@@ -8,6 +8,7 @@ import 'package:satria_optik/provider/user_provider.dart';
 import 'package:satria_optik/screen/auth/login_screen.dart';
 import 'package:satria_optik/screen/profile/address/address_screen.dart';
 import 'package:satria_optik/screen/profile/avatar_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../helper/user_helper.dart';
 import 'change_profile_detail.dart';
@@ -131,14 +132,14 @@ class ProfilePage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       IconButton(
-                        icon: const Icon(
-                          Icons.g_mobiledata_rounded,
+                        icon: const ImageIcon(
+                          AssetImage('assets/icons/google.png'),
                           size: 50,
                         ),
                         onPressed: () async {
                           await UserHelper()
                               .connectWithGoogle()
-                              .catchError((error, stackTrace) {
+                              .catchError((error, _) {
                             ScaffoldMessenger.of(context)
                                 .showSnackBar(SnackBar(content: Text(error)));
                           });
@@ -154,17 +155,35 @@ class ProfilePage extends StatelessWidget {
         const SizedBox(height: 20),
         const Text('Need Help? Contact Us'),
         const SizedBox(height: 10),
-        const Card(
+        Card(
           child: Column(
             children: [
-              ListTile(
-                title: Text('Customer Service'),
-                leading: Icon(Icons.headset_mic_rounded),
+              InkWell(
+                onTap: () async {
+                  final Uri launchUri = Uri(
+                    scheme: 'tel',
+                    path: '081318591184',
+                  );
+                  await launchUrl(launchUri);
+                },
+                child: const ListTile(
+                  title: Text('Customer Service'),
+                  leading: Icon(Icons.headset_mic_rounded),
+                ),
               ),
-              Divider(),
-              ListTile(
-                title: Text('Send Email'),
-                leading: Icon(Icons.mail_rounded),
+              const Divider(),
+              InkWell(
+                onTap: () async {
+                  final Uri launchUri = Uri(
+                    scheme: 'mailto',
+                    path: 'satriaoptik@gmail.com',
+                  );
+                  await launchUrl(launchUri);
+                },
+                child: const ListTile(
+                  title: Text('Send Email'),
+                  leading: Icon(Icons.mail_rounded),
+                ),
               ),
             ],
           ),
@@ -172,22 +191,48 @@ class ProfilePage extends StatelessWidget {
         const SizedBox(height: 20),
         const Text('Follow Us'),
         const SizedBox(height: 10),
-        const Card(
+        Card(
           child: Column(
             children: [
-              ListTile(
-                title: Text('Instagram'),
-                leading: ImageIcon(AssetImage('assets/icons/instagram.png')),
+              InkWell(
+                /// TODO chane the url
+                onTap: () async {
+                  await openLink('https://www.instagram.com/cikarangdaily/');
+                },
+                child: const ListTile(
+                  title: Text('Instagram'),
+                  leading: ImageIcon(AssetImage('assets/icons/instagram.png')),
+                ),
               ),
-              Divider(),
-              ListTile(
-                title: Text('Twitter'),
-                leading: ImageIcon(AssetImage('assets/icons/twitter.png')),
+              const Divider(),
+              InkWell(
+                onTap: () async {
+                  await openLink('https://twitter.com/fajallll');
+                },
+                child: const ListTile(
+                  title: Text('Twitter'),
+                  leading: ImageIcon(AssetImage('assets/icons/twitter.png')),
+                ),
               ),
-              Divider(),
-              ListTile(
-                title: Text('Facebook'),
-                leading: ImageIcon(AssetImage('assets/icons/facebook.png')),
+              const Divider(),
+              InkWell(
+                onTap: () async {
+                  await openLink('https://www.tiktok.com/@theprediction_');
+                },
+                child: const ListTile(
+                  title: Text('Tik Tok'),
+                  leading: ImageIcon(AssetImage('assets/icons/tik-tok.png')),
+                ),
+              ),
+              const Divider(),
+              InkWell(
+                onTap: () async {
+                  await openLink('https://facebook.com/fajar.zydyx');
+                },
+                child: const ListTile(
+                  title: Text('Facebook'),
+                  leading: ImageIcon(AssetImage('assets/icons/facebook.png')),
+                ),
               ),
             ],
           ),
@@ -203,7 +248,7 @@ class ProfilePage extends StatelessWidget {
             await FirebaseAuth.instance.signOut().then((value) {
               Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
                 builder: (context) {
-                  return LoginPage();
+                  return const LoginPage();
                 },
               ), (route) => false);
             });
@@ -212,6 +257,24 @@ class ProfilePage extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  Future<void> callTo(String phoneNumber) async {
+    final Uri launchUri = Uri(
+      scheme: 'tel',
+      path: phoneNumber,
+    );
+    await launchUrl(launchUri);
+  }
+
+  Future openLink(String url) async {
+    Uri uri = Uri.parse(url);
+    if (!await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+    )) {
+      throw Exception('Could not launch $uri');
+    }
   }
 }
 
@@ -248,9 +311,7 @@ class UserInformationWidgetTile extends StatelessWidget {
                     color: Colors.white54,
                   ),
                 ),
-                title == 'Email'
-                    ? const SizedBox()
-                    : const Icon(Icons.navigate_next_rounded),
+                const Icon(Icons.navigate_next_rounded),
               ],
             ),
           ],

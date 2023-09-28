@@ -81,7 +81,7 @@ class RegisterPage extends StatelessWidget {
                               genderController.text.trim(),
                             );
                             if (context.mounted) {
-                              await user.getUser();
+                              user.getUser();
                             }
                           },
                           child: const Text('REGISTER'),

@@ -5,23 +5,40 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 
 import 'package:satria_optik/provider/auth_provider.dart';
+import 'package:satria_optik/provider/user_provider.dart';
 import 'package:satria_optik/screen/auth/tos_screen.dart';
 
-import '../../provider/user_provider.dart';
 import '../home/home_navigation_controller.dart';
 import 'forgot_password_screen.dart';
 import 'register_screen.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   static const routeName = '/login';
+  final bool? isThrown;
 
-  const LoginPage({super.key});
+  const LoginPage({super.key, this.isThrown = false});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passController = TextEditingController();
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
+  // @override
+  // void initState() {
+  //   if (widget.isThrown!) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text("You're Logged Out. Please Login Again")),
+  //     );
+  //   }
+  //   super.initState();
+  // }
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController emailController = TextEditingController();
-    final TextEditingController passController = TextEditingController();
-    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
     return Scaffold(
       body: SafeArea(
         child: GestureDetector(
@@ -45,6 +62,7 @@ class LoginPage extends StatelessWidget {
                       TextFormField(
                         controller: emailController,
                         textInputAction: TextInputAction.next,
+                        autofillHints: const [AutofillHints.email],
                         decoration: const InputDecoration(
                           labelText: 'Email',
                         ),
@@ -60,6 +78,7 @@ class LoginPage extends StatelessWidget {
                       TextFormField(
                         controller: passController,
                         textInputAction: TextInputAction.done,
+                        autofillHints: const [AutofillHints.password],
                         decoration: const InputDecoration(
                           labelText: 'Password',
                         ),
@@ -89,31 +108,33 @@ class LoginPage extends StatelessWidget {
                                 value: authProv.isTosApproved,
                                 onChanged: (value) {
                                   authProv.tosValue = !authProv.isTosApproved;
-                                  print(authProv.isTosApproved);
                                 },
                               );
                             },
                           ),
-                          RichText(
-                            text: TextSpan(
-                              children: [
-                                const TextSpan(
-                                  text: 'By logging in, you accept our ',
-                                ),
-                                TextSpan(
-                                  text: 'Term And Privacy Policy',
-                                  style: const TextStyle(
-                                    color: Colors.blue,
-                                    decoration: TextDecoration.underline,
+                          Expanded(
+                            child: RichText(
+                              text: TextSpan(
+                                children: [
+                                  const TextSpan(
+                                    text: 'By logging in, you accept our ',
                                   ),
-                                  // Add an onTap function to handle the button tap
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () {
-                                      Navigator.of(context)
-                                          .pushNamed(TOSPage.routeName);
-                                    },
-                                ),
-                              ],
+                                  TextSpan(
+                                    text: 'Term And Privacy Policy',
+                                    style: TextStyle(
+                                      color:
+                                          Theme.of(context).primaryColorLight,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                    // Add an onTap function to handle the button tap
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () {
+                                        Navigator.of(context)
+                                            .pushNamed(TOSPage.routeName);
+                                      },
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
@@ -150,13 +171,12 @@ class LoginPage extends StatelessWidget {
                                     },
                                   );
                                   try {
-                                    await auth.signWithGoogle().then(
-                                      (value) async {
-                                        await user.getUser().then((value) {
-                                          Navigator.of(context)
-                                              .pushReplacementNamed(
-                                                  HomeNavigation.routeName);
-                                        });
+                                    await value.signWithGoogle().then(
+                                      (value) {
+                                        Navigator.of(context)
+                                            .pushNamedAndRemoveUntil(
+                                                HomeNavigation.routeName,
+                                                (route) => false);
                                       },
                                     );
                                   } catch (e) {
@@ -181,7 +201,7 @@ class LoginPage extends StatelessWidget {
                         onPressed: () {
                           Navigator.pushNamed(context, RegisterPage.routeName);
                         },
-                        child: const Text('Don\'t have an account? Register'),
+                        child: const Text("Don't have an account? Register"),
                       ),
                     ],
                   ),
@@ -227,12 +247,13 @@ class LoginWithPassword extends StatelessWidget {
                         .signWithPassword(emailController.text.trim(),
                             passController.text.trim())
                         .then(
-                      (value) {
+                      (value) async {
+                        await Provider.of<UserProvider>(context, listen: false)
+                            .getUser();
+
                         if (context.mounted) {
-                          Provider.of<UserProvider>(context, listen: false)
-                              .getUser();
-                          Navigator.of(context)
-                              .pushReplacementNamed(HomeNavigation.routeName);
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                              HomeNavigation.routeName, (route) => false);
                         }
                       },
                     );
@@ -244,6 +265,10 @@ class LoginWithPassword extends StatelessWidget {
                       ),
                     );
                   } catch (e) {
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('$e')),
+                    );
                     debugPrint('$e');
                   }
                 }

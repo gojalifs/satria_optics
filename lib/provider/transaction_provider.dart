@@ -5,9 +5,9 @@ import 'package:satria_optik/model/transactions.dart';
 class TransactionProvider extends ChangeNotifier {
   final CheckoutHelper helper = CheckoutHelper();
   ConnectionState _state = ConnectionState.none;
-  List<Transactions>? _transactions = [];
-  int _shippingFee = 0;
-  int _discount = 0;
+  final List<Transactions> _transactions = [];
+  final int _shippingFee = 0;
+  final int _discount = 0;
   int _grandTotal = 0;
 
   ConnectionState get state => _state;
@@ -22,7 +22,6 @@ class TransactionProvider extends ChangeNotifier {
 
   Future<String> addTransaction(
       Transactions transaction, List<String> cartId) async {
-
     _state = ConnectionState.active;
     var transactId = await helper.addTransaction(transaction, cartId);
     _state = ConnectionState.done;

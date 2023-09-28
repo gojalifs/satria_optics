@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:satria_optik/provider/frames_provider.dart';
 
+import '../../provider/user_provider.dart';
 import 'recommended_product_widget.dart';
 
 class HomePage extends StatelessWidget {
@@ -10,7 +11,8 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await Provider.of<FrameProvider>(context, listen: false).getAllFrames();
+      Provider.of<FrameProvider>(context, listen: false).getAllFrames();
+      Provider.of<UserProvider>(context, listen: false).getUser();
     });
     return Consumer<FrameProvider>(
       builder: (context, value, child) => ListView(

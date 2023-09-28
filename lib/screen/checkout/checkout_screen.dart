@@ -142,7 +142,7 @@ class CheckoutPage extends StatelessWidget {
                           Row(
                             children: [
                               Image.network(
-                                cart.product.colors![cart.color],
+                                cart.product.colors![0].url!,
                                 width: 100,
                                 height: 100,
                               ),
@@ -336,29 +336,29 @@ class CheckoutPage extends StatelessWidget {
                               );
                             }
 
-                            try {
-                              var orderId = await transactProv.addTransaction(
-                                  order, cartId);
-                              var transactData = await midtransHelper
-                                  .getTransactToken(orderId, grandTotal);
-                              await transactProv.updatePaymentData(orderId,
-                                  orderId, transactData['redirect_url']);
-                              if (context.mounted) {
-                                Navigator.of(context).pushNamed(
-                                  PaymentWebView.routeName,
-                                  arguments: {
-                                    'url': transactData['redirect_url'],
-                                    'id': orderId,
-                                  },
-                                );
-                              }
-                            } catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('$e'),
-                                ),
+                            // try {
+                            var orderId = await transactProv.addTransaction(
+                                order, cartId);
+                            var transactData = await midtransHelper
+                                .getTransactToken(orderId, grandTotal);
+                            await transactProv.updatePaymentData(
+                                orderId, orderId, transactData['redirect_url']);
+                            if (context.mounted) {
+                              Navigator.of(context).pushNamed(
+                                PaymentWebView.routeName,
+                                arguments: {
+                                  'url': transactData['redirect_url'],
+                                  'id': orderId,
+                                },
                               );
                             }
+                            // } catch (e) {
+                            //   ScaffoldMessenger.of(context).showSnackBar(
+                            //     SnackBar(
+                            //       content: Text('$e'),
+                            //     ),
+                            //   );
+                            // }
                           },
                     child: Container(
                       height: 50,

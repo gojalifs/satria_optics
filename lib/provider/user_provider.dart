@@ -4,43 +4,45 @@ import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:satria_optik/helper/user_helper.dart';
+import 'package:satria_optik/provider/base_provider.dart';
 import '../model/user.dart';
 
-class UserProvider extends ChangeNotifier {
+class UserProvider extends BaseProvider {
   final UserHelper _helper = UserHelper();
-  ConnectionState _state = ConnectionState.none;
   UserProfile? _userProfile = UserProfile();
   final ImagePicker picker = ImagePicker();
   XFile? _image;
 
   UserProfile? get userProfile => _userProfile;
-  ConnectionState get state => _state;
   XFile? get image => _image;
 
   Future getUser() async {
-    _state = ConnectionState.active;
+    state = ConnectionState.active;
+
     _userProfile = await _helper.getUserProfile();
-    _state = ConnectionState.done;
+    state = ConnectionState.done;
 
     notifyListeners();
   }
 
   Future updateUser(Map<String, dynamic> userData) async {
-    _state = ConnectionState.active;
+    state = ConnectionState.active;
     try {
       await _helper.updateUser(userData);
       Map<String, dynamic>? userMap = _userProfile?.toMap();
 
       Map<String, dynamic> newUserData = {...?userMap, ...userData};
       _userProfile = UserProfile.fromMap(newUserData);
+    } catch (e) {
+      rethrow;
     } finally {
-      _state = ConnectionState.done;
+      state = ConnectionState.done;
       notifyListeners();
     }
   }
 
   Future updateAvatar() async {
-    _state = ConnectionState.active;
+    state = ConnectionState.active;
     try {
       String? imageUrl = await _helper.updateAvatar(File(_image!.path));
       var user = _userProfile?.toMap();
@@ -56,7 +58,7 @@ class UserProvider extends ChangeNotifier {
     } catch (e) {
       throw 'Error when updating your avatar, $e';
     } finally {
-      _state = ConnectionState.done;
+      state = ConnectionState.done;
       notifyListeners();
     }
   }

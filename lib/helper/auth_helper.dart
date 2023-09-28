@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:satria_optik/helper/firestore_helper.dart';
@@ -6,12 +7,11 @@ import '../model/user.dart';
 import 'user_helper.dart';
 
 class AuthHelper extends FirestoreHelper {
-  Future<bool> getLoginStatus() async {
+  Future<User?> getLoginStatus() async {
     try {
       final user = await FirebaseAuth.instance.authStateChanges().first;
-
       if (user != null) {
-        return true;
+        return user;
       } else {
         throw 'logged out';
       }
@@ -20,11 +20,27 @@ class AuthHelper extends FirestoreHelper {
     }
   }
 
-  Future<UserCredential> signInwithPass(String email, String pass) async {
-    return await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: email,
-      password: pass,
-    );
+  Future<UserCredential?> signInwithPass(String email, String pass) async {
+    try {
+      var credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: pass,
+      );
+      var docRef = FirebaseFirestore.instance
+          .collection("users")
+          .doc(credential.user?.uid);
+      var data = await docRef.get();
+      var dataMap = data.data();
+
+      if (dataMap == null) {
+        await GoogleSignIn().signOut();
+        await FirebaseAuth.instance.signOut();
+        throw 'user not found';
+      }
+      return credential;
+    } catch (e) {
+      rethrow;
+    }
   }
 
   Future signInWithGoogle() async {
@@ -73,7 +89,7 @@ class AuthHelper extends FirestoreHelper {
     }
   }
 
-  Future<bool> registerEmail(String name, String email, String phone,
+  Future<UserCredential> registerEmail(String name, String email, String phone,
       String password, String birth, String gender) async {
     UserProfile user = UserProfile(
       id: null,
@@ -91,8 +107,7 @@ class AuthHelper extends FirestoreHelper {
         password: password,
       );
 
-      await UserHelper().createUser(user, uid.user!.uid);
-      return true;
+      return await UserHelper().createUser(user, uid.user!.uid);
     } catch (e) {
       rethrow;
     }

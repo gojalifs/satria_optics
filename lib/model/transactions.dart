@@ -136,6 +136,7 @@ class Transactions {
     };
   }
 
+  /// TODO MAKE NEW MODEL
   factory Transactions.fromMap(Map<String, dynamic> map) {
     return Transactions(
       id: map['id'],
@@ -219,5 +220,190 @@ class Transactions {
   @override
   String toString() {
     return 'Transactions(id: $id, cartProduct: $cartProduct, address: $address, shipper: $shipper, subTotal: $subTotal, shippingFee: $shippingFee, discount: $discount, total: $total, receiptNumber: $receiptNumber, paymentStatus: $paymentStatus, paymentId: $paymentId, redirectUrl: $redirectUrl, deliveryStatus: $deliveryStatus, orderMadeTime: $orderMadeTime, paymentMadeTime: $paymentMadeTime, paymentExpiry: $paymentExpiry, receiptUpdateTime: $receiptUpdateTime, orderFinishTime: $orderFinishTime), orderStatus: $orderStatus';
+  }
+}
+
+class ProductOnCart {
+  final String? imageVariant;
+  final String? description;
+  final bool? favoritedBy;
+  final String? name;
+  final int? price;
+  final String? rating;
+  final String? type;
+  final String? shape;
+  final String? gender;
+  final String? material;
+
+  ProductOnCart({
+    this.imageVariant,
+    this.description,
+    this.favoritedBy,
+    this.name,
+    this.price,
+    this.rating,
+    this.type,
+    this.shape,
+    this.gender,
+    this.material,
+  });
+
+  ProductOnCart copyWith({
+    String? imageVariant,
+    String? description,
+    bool? favoritedBy,
+    String? name,
+    int? price,
+    String? rating,
+    String? type,
+    String? shape,
+    String? gender,
+    String? material,
+  }) {
+    return ProductOnCart(
+      imageVariant: imageVariant ?? this.imageVariant,
+      description: description ?? this.description,
+      favoritedBy: favoritedBy ?? this.favoritedBy,
+      name: name ?? this.name,
+      price: price ?? this.price,
+      rating: rating ?? this.rating,
+      type: type ?? this.type,
+      shape: shape ?? this.shape,
+      gender: gender ?? this.gender,
+      material: material ?? this.material,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'imageVariant': imageVariant,
+      'description': description,
+      'favoritedBy': favoritedBy,
+      'name': name,
+      'price': price,
+      'rating': rating,
+      'type': type,
+      'shape': shape,
+      'gender': gender,
+      'material': material,
+    };
+  }
+
+  factory ProductOnCart.fromMap(Map<String, dynamic> map) {
+    return ProductOnCart(
+      imageVariant: map['colors'],
+      description: map['description'],
+      favoritedBy: map['favoritedBy'],
+      name: map['name'],
+      price: map['price']?.toInt(),
+      rating: map['rating'],
+      type: map['type'],
+      shape: map['shape'],
+      gender: map['gender'],
+      material: map['material'],
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory ProductOnCart.fromJson(String source) =>
+      ProductOnCart.fromMap(json.decode(source));
+
+  @override
+  String toString() {
+    return 'ProductOnCart(imageVariant: $imageVariant, description: $description, favoritedBy: $favoritedBy, name: $name, price: $price, rating: $rating, type: $type, shape: $shape, gender: $gender, material: $material)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is ProductOnCart &&
+        other.imageVariant == imageVariant &&
+        other.description == description &&
+        other.favoritedBy == favoritedBy &&
+        other.name == name &&
+        other.price == price &&
+        other.rating == rating &&
+        other.type == type &&
+        other.shape == shape &&
+        other.gender == gender &&
+        other.material == material;
+  }
+
+  @override
+  int get hashCode {
+    return imageVariant.hashCode ^
+        description.hashCode ^
+        favoritedBy.hashCode ^
+        name.hashCode ^
+        price.hashCode ^
+        rating.hashCode ^
+        type.hashCode ^
+        shape.hashCode ^
+        gender.hashCode ^
+        material.hashCode;
+  }
+}
+
+class MinusData {
+  String? leftEyeMinus;
+  String? rightEyeMinus;
+  String? leftEyePlus;
+  String? rightEyePlus;
+  String? recipePath;
+
+  MinusData({
+    this.leftEyeMinus,
+    this.rightEyeMinus,
+    this.leftEyePlus,
+    this.rightEyePlus,
+    this.recipePath,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'leftEyeMinus': leftEyeMinus,
+      'rightEyeMinus': rightEyeMinus,
+      'leftEyePlus': leftEyePlus,
+      'rightEyePlus': rightEyePlus,
+      'recipePath': recipePath,
+    };
+  }
+
+  factory MinusData.fromMap(Map<String, dynamic> map) {
+    return MinusData(
+      leftEyeMinus: map['leftEyeMinus'],
+      rightEyeMinus: map['rightEyeMinus'],
+      leftEyePlus: map['leftEyePlus'],
+      rightEyePlus: map['rightEyePlus'],
+      recipePath: map['recipePath'],
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory MinusData.fromJson(String source) =>
+      MinusData.fromMap(json.decode(source));
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is MinusData &&
+        other.leftEyeMinus == leftEyeMinus &&
+        other.rightEyeMinus == rightEyeMinus &&
+        other.leftEyePlus == leftEyePlus &&
+        other.rightEyePlus == rightEyePlus &&
+        other.recipePath == recipePath;
+  }
+
+  @override
+  int get hashCode {
+    return leftEyeMinus.hashCode ^
+        rightEyeMinus.hashCode ^
+        leftEyePlus.hashCode ^
+        rightEyePlus.hashCode ^
+        recipePath.hashCode;
   }
 }

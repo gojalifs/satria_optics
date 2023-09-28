@@ -97,8 +97,9 @@ class CustomTabbarWidget extends StatelessWidget {
                               ),
                               margin: const EdgeInsets.only(right: 10),
                               child: Image.network(
-                                order.cartProduct![0].product
-                                    .colors![order.cartProduct![0].color],
+                                order.cartProduct![0].product.colors![0].url!,
+                                // order.cartProduct![0].product
+                                //     .colors![order.cartProduct![0].color].url!,
                                 fit: BoxFit.cover,
                                 errorBuilder: (context, error, stackTrace) {
                                   return const Text(
