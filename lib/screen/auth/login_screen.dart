@@ -173,8 +173,9 @@ class _LoginPageState extends State<LoginPage> {
                                     await value.signWithGoogle().then(
                                       (value) {
                                         Navigator.of(context)
-                                            .pushReplacementNamed(
-                                                HomeNavigation.routeName);
+                                            .pushNamedAndRemoveUntil(
+                                                HomeNavigation.routeName,
+                                                (route) => false);
                                       },
                                     );
                                   } catch (e) {
@@ -250,8 +251,8 @@ class LoginWithPassword extends StatelessWidget {
                             .getUser();
 
                         if (context.mounted) {
-                          Navigator.of(context)
-                              .pushReplacementNamed(HomeNavigation.routeName);
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                              HomeNavigation.routeName, (route) => false);
                         }
                       },
                     );
