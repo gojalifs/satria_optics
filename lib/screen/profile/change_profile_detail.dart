@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:satria_optik/provider/auth_provider.dart';
 import 'package:satria_optik/provider/user_provider.dart';
@@ -8,7 +7,6 @@ import 'package:satria_optik/utils/custom_loading.dart';
 
 import '../../helper/user_helper.dart';
 import '../../utils/common_widget.dart';
-import '../auth/login_screen.dart';
 
 class ChangeProfileDetailPage extends StatefulWidget {
   static String routeName = '/changeprofiledetail';
