@@ -5,23 +5,40 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 
 import 'package:satria_optik/provider/auth_provider.dart';
+import 'package:satria_optik/provider/user_provider.dart';
 import 'package:satria_optik/screen/auth/tos_screen.dart';
 
-import '../../provider/user_provider.dart';
 import '../home/home_navigation_controller.dart';
 import 'forgot_password_screen.dart';
 import 'register_screen.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   static const routeName = '/login';
+  final bool? isThrown;
 
-  const LoginPage({super.key});
+  const LoginPage({super.key, this.isThrown = false});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passController = TextEditingController();
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
+  // @override
+  // void initState() {
+  //   if (widget.isThrown!) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text("You're Logged Out. Please Login Again")),
+  //     );
+  //   }
+  //   super.initState();
+  // }
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController emailController = TextEditingController();
-    final TextEditingController passController = TextEditingController();
-    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
     return Scaffold(
       body: SafeArea(
         child: GestureDetector(
@@ -228,10 +245,11 @@ class LoginWithPassword extends StatelessWidget {
                         .signWithPassword(emailController.text.trim(),
                             passController.text.trim())
                         .then(
-                      (value) {
+                      (value) async {
+                        await Provider.of<UserProvider>(context, listen: false)
+                            .getUser();
+
                         if (context.mounted) {
-                          Provider.of<UserProvider>(context, listen: false)
-                              .getUser(value.user?.uid);
                           Navigator.of(context)
                               .pushReplacementNamed(HomeNavigation.routeName);
                         }

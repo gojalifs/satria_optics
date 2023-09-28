@@ -71,7 +71,7 @@ class RegisterPage extends StatelessWidget {
                       Consumer2<AuthProvider, UserProvider>(
                         builder: (context, auth, user, child) => ElevatedButton(
                           onPressed: () async {
-                            var credential = await auth.registerWithEmail(
+                            await auth.registerWithEmail(
                               nameController.text.trim(),
                               emailController.text.trim(),
                               phoneController.text.trim(),
@@ -80,7 +80,7 @@ class RegisterPage extends StatelessWidget {
                               genderController.text.trim(),
                             );
                             if (context.mounted) {
-                              await user.getUser(credential.user?.uid);
+                              user.getUser();
                             }
                           },
                           child: const Text('REGISTER'),

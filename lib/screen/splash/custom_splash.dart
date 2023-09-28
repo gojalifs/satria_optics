@@ -25,7 +25,7 @@ class _SplashPageState extends State<SplashPage> {
         .getLoginStatus()
         .then((uid) async {
       if (uid != null && uid.isNotEmpty) {
-        await Provider.of<UserProvider>(context, listen: false).getUser(uid);
+        await Provider.of<UserProvider>(context, listen: false).getUser();
 
         if (context.mounted) {
           Navigator.pushReplacementNamed(context, HomeNavigation.routeName);

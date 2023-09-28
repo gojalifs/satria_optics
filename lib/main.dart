@@ -78,7 +78,6 @@ class MyApp extends StatelessWidget {
         theme: CustomTheme.customTheme,
         home: const SplashPage(),
         routes: {
-          LoginPage.routeName: (context) => const LoginPage(),
           TOSPage.routeName: (context) => const TOSPage(),
           ProfilePage.routeName: (context) => const ProfilePage(),
           CartPage.routeName: (context) => const CartPage(),
@@ -92,6 +91,12 @@ class MyApp extends StatelessWidget {
           OrderDetailPage.routeName: (context) => const OrderDetailPage(),
         },
         onGenerateRoute: (settings) {
+          if (settings.name == LoginPage.routeName) {
+            final args = settings.arguments as bool?;
+            return MaterialPageRoute(
+              builder: (context) => LoginPage(isThrown: args ?? false),
+            );
+          }
           if (settings.name == HomeNavigation.routeName) {
             final args = settings.arguments as int?;
             return MaterialPageRoute(

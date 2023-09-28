@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:satria_optik/provider/base_provider.dart';
 
 import '../helper/auth_helper.dart';
@@ -33,13 +34,23 @@ class AuthProvider extends BaseProvider {
     }
   }
 
+  Future<List<String>> checkLoginMethod(String email) async {
+    try {
+      var data = await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
+      return data;
+    } catch (e) {
+      throw 'Error Happened';
+    }
+  }
+
   Future<UserCredential> signWithPassword(String email, String pass) async {
     state = ConnectionState.active;
     try {
       var credential = await _authHelper.signInwithPass(email, pass);
+
       return credential!;
     } catch (e) {
-      throw 'Error. This Email Is Reserved';
+      rethrow;
     } finally {
       state = ConnectionState.done;
       notifyListeners();
@@ -61,6 +72,34 @@ class AuthProvider extends BaseProvider {
           name, email, phone, password, birth, gender);
     } catch (e) {
       throw 'Error while registering your account';
+    }
+  }
+
+  Future logout() async {
+    await GoogleSignIn().signOut();
+    await FirebaseAuth.instance.signOut();
+  }
+
+  Future unlinkGoogle() async {
+    state = ConnectionState.active;
+
+    try {
+      print(FirebaseAuth.instance.currentUser?.providerData.map((e) {
+        e.providerId;
+        return e.providerId;
+      }));
+      await FirebaseAuth.instance.currentUser?.unlink("google.com");
+      print('success');
+    } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        case "no-such-provider":
+          throw 'No Provider Found. If error still occured, please contact admin';
+        default:
+          throw 'Unknown Error';
+      }
+    } finally {
+      state = ConnectionState.done;
+      notifyListeners();
     }
   }
 }

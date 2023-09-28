@@ -16,10 +16,10 @@ class UserProvider extends BaseProvider {
   UserProfile? get userProfile => _userProfile;
   XFile? get image => _image;
 
-  Future getUser(String? uid) async {
+  Future getUser() async {
     state = ConnectionState.active;
 
-    _userProfile = await _helper.getUserProfile(uid);
+    _userProfile = await _helper.getUserProfile();
     state = ConnectionState.done;
 
     notifyListeners();
@@ -33,6 +33,8 @@ class UserProvider extends BaseProvider {
 
       Map<String, dynamic> newUserData = {...?userMap, ...userData};
       _userProfile = UserProfile.fromMap(newUserData);
+    } catch (e) {
+      rethrow;
     } finally {
       state = ConnectionState.done;
       notifyListeners();

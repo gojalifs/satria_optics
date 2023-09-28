@@ -21,21 +21,26 @@ class AuthHelper extends FirestoreHelper {
   }
 
   Future<UserCredential?> signInwithPass(String email, String pass) async {
-    var credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: email,
-      password: pass,
-    );
-    var docRef = FirebaseFirestore.instance
-        .collection("users")
-        .doc(credential.user?.uid);
-    var data = await docRef.get();
-    var dataMap = data.data();
-    if (dataMap == null) {
-      await GoogleSignIn().signOut();
-      await FirebaseAuth.instance.signOut();
-      return null;
+    try {
+      var credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: pass,
+      );
+      var docRef = FirebaseFirestore.instance
+          .collection("users")
+          .doc(credential.user?.uid);
+      var data = await docRef.get();
+      var dataMap = data.data();
+
+      if (dataMap == null) {
+        await GoogleSignIn().signOut();
+        await FirebaseAuth.instance.signOut();
+        throw 'user not found';
+      }
+      return credential;
+    } catch (e) {
+      rethrow;
     }
-    return credential;
   }
 
   Future signInWithGoogle() async {

@@ -139,7 +139,7 @@ class ProfilePage extends StatelessWidget {
                         onPressed: () async {
                           await UserHelper()
                               .connectWithGoogle()
-                              .catchError((error, stackTrace) {
+                              .catchError((error, _) {
                             ScaffoldMessenger.of(context)
                                 .showSnackBar(SnackBar(content: Text(error)));
                           });
@@ -311,9 +311,7 @@ class UserInformationWidgetTile extends StatelessWidget {
                     color: Colors.white54,
                   ),
                 ),
-                title == 'Email'
-                    ? const SizedBox()
-                    : const Icon(Icons.navigate_next_rounded),
+                const Icon(Icons.navigate_next_rounded),
               ],
             ),
           ],

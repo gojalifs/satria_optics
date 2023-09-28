@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
@@ -19,40 +20,50 @@ class UserHelper extends FirestoreHelper {
         .onError((error, stackTrace) => throw '$error');
   }
 
-  Future<UserProfile?> getUserProfile(String? uid) async {
-    // try {
-    var userData = UserProfile();
-    DocumentReference<Map<String, dynamic>> docRef;
+  Future<UserProfile?> getUserProfile() async {
+    try {
+      var userData = UserProfile();
+      DocumentReference<Map<String, dynamic>> docRef;
+      userId = FirebaseAuth.instance.currentUser?.uid;
+      docRef = FirebaseFirestore.instance.collection("users").doc(userID);
+      if (userID == null) {
+        return null;
+      }
 
-    docRef = FirebaseFirestore.instance.collection("users").doc(uid);
-    if (uid == null) {
-      return null;
+      var data = await docRef.get();
+      var dataMap = data.data();
+
+      if (dataMap?['avatarPath'] != null) {
+        var response = await http.get(Uri.parse(dataMap?['avatarPath']));
+        var directory = await getTemporaryDirectory();
+        var file = File('${directory.path}/image.jpg');
+        await file.writeAsBytes(response.bodyBytes);
+        dataMap?['image'] = file;
+      }
+
+      userData = UserProfile.fromMap(dataMap!);
+      return userData;
+    } catch (e, s) {
+      debugPrint('$s');
+      throw 'errror $e';
     }
-
-    var data = await docRef.get();
-    var dataMap = data.data();
-
-    if (dataMap?['avatarPath'] != null) {
-      var response = await http.get(Uri.parse(dataMap?['avatarPath']));
-      var directory = await getTemporaryDirectory();
-      var file = File('${directory.path}/image.jpg');
-      await file.writeAsBytes(response.bodyBytes);
-      dataMap?['image'] = file;
-    }
-
-    userData = UserProfile.fromMap(dataMap!);
-    return userData;
-    // } catch (e, s) {
-    //   print(s);
-    //   throw 'errror $e';
-    // }
   }
 
   Future updateUser(Map<String, dynamic> data) async {
     try {
+      if (data.keys.contains('email')) {
+        print('update email');
+        final user = await FirebaseAuth.instance.authStateChanges().first;
+        await user?.updateEmail(data['email']);
+      }
+
+      /// TODO make sure this fix
       var userRef = db.collection('users').doc(userID);
       await userRef.update(data);
     } catch (e) {
+      if (e == 'requires-recent-login') {
+        rethrow;
+      }
       throw "Error updating document, $e";
     }
   }
