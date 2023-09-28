@@ -28,6 +28,7 @@ class FavoriteHelper extends FirestoreHelper {
 
     for (var element in data.docs) {
       var frame = element.data();
+      frame['id'] = element.id;
       favs.add(GlassFrame.fromMap(frame));
     }
 

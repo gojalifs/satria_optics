@@ -10,7 +10,6 @@ class FrameHelper extends FirestoreHelper {
       for (var snapshot in snapshots.docs) {
         var data = snapshot.data();
         data['id'] = snapshot.id;
-        data['favoritedBy'] = data[userID];
 
         frames.add(data);
       }
@@ -23,7 +22,6 @@ class FrameHelper extends FirestoreHelper {
     var frameData = await frameRef.get();
     var frame = frameData.data();
     frame?['id'] = frameData.id;
-    frame?['favoritedBy'] = frameData.data()?['favoritedBy'][userID];
     return GlassFrame.fromMap(frame ?? {});
   }
 }
