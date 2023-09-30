@@ -20,11 +20,6 @@ class FavouritePage extends StatelessWidget {
                 color: Colors.white, size: 25),
           );
         }
-        if (favProv.favFramesId.isEmpty) {
-          return const Center(
-            child: Text("You don't have any favorite. Try looking some glass"),
-          );
-        }
         return EasyRefresh(
           onRefresh: () {
             Provider.of<FavoriteProvider>(context, listen: false)
@@ -32,11 +27,17 @@ class FavouritePage extends StatelessWidget {
           },
           refreshOnStart: favProv.favFrames.isEmpty ? true : false,
           child: ListView.builder(
-            itemCount: favProv.favFramesId.length,
+            itemCount:
+                favProv.favFramesId.isEmpty ? 1 : favProv.favFramesId.length,
             itemBuilder: (context, index) {
+              if (favProv.favFramesId.isEmpty) {
+                return const Center(
+                  child: Text(
+                      "You don't have any favorite. Try looking some glass"),
+                );
+              }
               return InkWell(
                 onTap: () {
-                  print(favProv.favFrames[index]);
                   Navigator.pushNamed(
                     context,
                     ProductDetailPage.routeName,
@@ -90,7 +91,7 @@ class _FavouriteCard extends StatelessWidget {
               builder: (context, value, child) => IconButton(
                 onPressed: () async {
                   try {
-                    await value.updateFavorite(products[index].id!);
+                    await value.updateFavorite(products[index]);
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(

@@ -10,8 +10,11 @@ class FavoriteHelper extends FirestoreHelper {
 
       var user = await userRef.get();
       var userData = user.data();
-      var favData =
-          (userData?['favorites'] as List).map((e) => e.toString()).toList();
+      List<String> favData = [];
+      if (userData?['favorites'] != null) {
+        favData =
+            (userData?['favorites'] as List).map((e) => e.toString()).toList();
+      }
 
       return favData;
     } catch (e, s) {
@@ -21,21 +24,21 @@ class FavoriteHelper extends FirestoreHelper {
   }
 
   Future<List<GlassFrame>> getFavoritesFrame(List<String> favsId) async {
-    // try {
-    List<GlassFrame> favs = [];
-    final ref = db.collection('products');
-    var data = await ref.where(FieldPath.documentId, whereIn: favsId).get();
+    try {
+      List<GlassFrame> favs = [];
+      final ref = db.collection('products');
+      var data = await ref.where(FieldPath.documentId, whereIn: favsId).get();
 
-    for (var element in data.docs) {
-      var frame = element.data();
-      frame['id'] = element.id;
-      favs.add(GlassFrame.fromMap(frame));
+      for (var element in data.docs) {
+        var frame = element.data();
+        frame['id'] = element.id;
+        favs.add(GlassFrame.fromMap(frame));
+      }
+
+      return favs;
+    } catch (e) {
+      throw 'Error Happened. . .';
     }
-
-    return favs;
-    // } catch (e) {
-    //   throw 'Error Happened. . .';
-    // }
   }
 
   Future<bool> updateFavorite(List<String> favorites) async {

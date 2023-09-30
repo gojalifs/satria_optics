@@ -47,15 +47,12 @@ class CartPage extends StatelessWidget {
                     }
 
                     if (cartProv.carts.isEmpty) {
-                      return Center(
-                        child: ListView(
-                          shrinkWrap: true,
-                          children: const [
-                            Center(
-                              child: Text('Your cart is empty'),
-                            ),
-                          ],
-                        ),
+                      return ListView(
+                        children: const [
+                          Center(
+                            child: Text('Your cart is empty'),
+                          ),
+                        ],
                       );
                     }
 

@@ -188,7 +188,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                               );
 
                               bool isAddFavorite = await favProv
-                                  .updateFavorite(widget.glassFrame.id!);
+                                  .updateFavorite(widget.glassFrame);
 
                               if (!mounted) {
                                 return;

@@ -28,10 +28,10 @@ class FavoriteProvider extends ChangeNotifier {
   Future getFavProducts() async {
     _state = ConnectionState.active;
     try {
+      _favFramesId = await _helper.getFavoritesId();
       if (_favFramesId.isEmpty) {
-        _favFramesId = await _helper.getFavoritesId();
+        return;
       }
-      print(_favFramesId);
       _favFrames = await _helper.getFavoritesFrame(_favFramesId);
     } catch (e) {
       rethrow;
@@ -41,15 +41,17 @@ class FavoriteProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> updateFavorite(String frameId) async {
+  Future<bool> updateFavorite(GlassFrame frame) async {
     _state = ConnectionState.active;
     bool isAdd = true;
     try {
-      if (_favFramesId.contains(frameId)) {
-        _favFramesId.remove(frameId);
+      if (_favFrames.contains(frame)) {
+        _favFramesId.remove(frame.id);
+        _favFrames.remove(frame);
         isAdd = false;
       } else {
-        _favFramesId.add(frameId);
+        _favFramesId.add(frame.id!);
+        _favFrames.add(frame);
       }
 
       await _helper.updateFavorite(_favFramesId);
