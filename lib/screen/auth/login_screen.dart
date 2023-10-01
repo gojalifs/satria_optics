@@ -26,6 +26,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  var isObscure = true;
 
   // @override
   // void initState() {
@@ -79,10 +80,19 @@ class _LoginPageState extends State<LoginPage> {
                         controller: passController,
                         textInputAction: TextInputAction.done,
                         autofillHints: const [AutofillHints.password],
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'Password',
+                          suffix: IconButton(
+                            onPressed: () {
+                              isObscure = !isObscure;
+                              setState(() {});
+                            },
+                            icon: Icon(isObscure
+                                ? Icons.visibility_rounded
+                                : Icons.visibility_off_rounded),
+                          ),
                         ),
-                        obscureText: true,
+                        obscureText: isObscure,
                         validator: (value) {
                           if (value!.isEmpty) {
                             return 'Please enter your password';

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:satria_optik/provider/favorite_provider.dart';
+import 'package:satria_optik/utils/custom_function.dart';
 
 import '../../../model/glass_frame.dart';
 import '../../../provider/frames_provider.dart';
@@ -157,7 +158,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          '${widget.glassFrame.price}',
+                          Format.formatToRupiah(widget.glassFrame.price),
                           style: Theme.of(context)
                               .textTheme
                               .bodyMedium!
@@ -307,7 +308,12 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                           flex: 2,
                                           child: Text(e.description ?? '')),
                                       const SizedBox(width: 10),
-                                      Expanded(child: Text('${e.price}')),
+                                      Expanded(
+                                        child: Text(
+                                          Format.formatToRupiah(e.price),
+                                          textAlign: TextAlign.end,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 )

@@ -20,7 +20,6 @@ class CheckoutHelper extends FirestoreHelper {
     data['cartProduct'] = transaction.cartProduct?.map((e) {
       return e.toMap();
     }).toList();
-    print(data);
     await checkoutRef.set(data);
 
     for (var i = 0; i < cartId.length; i++) {

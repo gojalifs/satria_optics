@@ -1,3 +1,5 @@
+import 'package:cherry_toast/cherry_toast.dart';
+import 'package:cherry_toast/resources/arrays.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +8,7 @@ import 'package:provider/provider.dart';
 
 import 'package:satria_optik/model/cart.dart';
 import 'package:satria_optik/utils/custom_function.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../helper/midtrans_helper.dart';
 import '../../provider/order_provider.dart';
@@ -19,7 +22,6 @@ class OrderDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final formatter = Format();
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
@@ -125,18 +127,18 @@ class OrderDetailPage extends StatelessWidget {
                                   title: 'Lens Type',
                                   detail:
                                       '''${order.cartProduct![index].lens.name!} '''
-                                      '''${formatter.formatToRupiah(order.cartProduct![index].lens.price!)}'''),
+                                      '''${Format.formatToRupiah(order.cartProduct![index].lens.price!)}'''),
                               MinusDataPanel(
                                 minusData: order.cartProduct![index].minusData,
                               ),
                               _DetailRow(
                                 title: 'Price',
-                                detail: formatter.formatToRupiah(
+                                detail: Format.formatToRupiah(
                                     order.cartProduct![index].product.price!),
                               ),
                               _DetailRow(
                                 title: 'Total',
-                                detail: formatter.formatToRupiah(
+                                detail: Format.formatToRupiah(
                                   order.cartProduct![index].totalPrice!.toInt(),
                                 ),
                               ),
@@ -152,21 +154,20 @@ class OrderDetailPage extends StatelessWidget {
                             children: [
                               _DetailRow(
                                   title: 'Subtotal Product(s)',
-                                  detail: formatter
-                                      .formatToRupiah(order.subTotal!)),
+                                  detail:
+                                      Format.formatToRupiah(order.subTotal!)),
                               _DetailRow(
                                 title: 'Delivery Fee',
-                                detail: formatter
-                                    .formatToRupiah(order.shippingFee!),
+                                detail:
+                                    Format.formatToRupiah(order.shippingFee!),
                               ),
                               _DetailRow(
                                 title: 'Discount',
-                                detail:
-                                    formatter.formatToRupiah(order.discount!),
+                                detail: Format.formatToRupiah(order.discount!),
                               ),
                               _DetailRow(
                                   title: 'Grand Total',
-                                  detail: formatter.formatToRupiah(
+                                  detail: Format.formatToRupiah(
                                       order.subTotal! +
                                           order.shippingFee! -
                                           order.discount!)),
@@ -229,20 +230,20 @@ class OrderDetailPage extends StatelessWidget {
                                 _DetailRow(
                                     title: 'Order Made At',
                                     detail: order.orderMadeTime != null
-                                        ? formatter
-                                            .timeFormat(order.orderMadeTime!)
+                                        ? Format.timeFormat(
+                                            order.orderMadeTime!)
                                         : 'No Data'),
                                 order.paymentMadeTime != null
                                     ? _DetailRow(
                                         title: 'Paid At',
-                                        detail: formatter
-                                            .timeFormat(order.paymentMadeTime!))
+                                        detail: Format.timeFormat(
+                                            order.paymentMadeTime!))
                                     : _DetailRow(
                                         title: 'Payment Expiry At',
                                         detail: order.paymentExpiry != null
-                                            ? formatter.timeFormat(
+                                            ? Format.timeFormat(
                                                 order.paymentExpiry!)
-                                            : formatter.timeFormat(
+                                            : Format.timeFormat(
                                                 Timestamp.fromDate(
                                                   order.orderMadeTime!
                                                       .toDate()
@@ -334,9 +335,18 @@ class OrderDetailPage extends StatelessWidget {
                 alignment: Alignment.bottomCenter,
                 child: Consumer<OrderProvider>(
                   builder: (context, value, child) => ElevatedButton(
-                    onPressed: value.order.receiptNumber!.contains('Not')
-                        ? null
-                        : () {},
+                    onPressed: () async {
+                      var url = Uri.parse(
+                          'https://cekresi.com/?noresi=${value.order.receiptNumber}');
+                      if (!await launchUrl(url)) {
+                        if (context.mounted) {
+                          CherryToast.error(
+                            toastPosition: Position.bottom,
+                            title: const Text("Couldn't track receipt number"),
+                          ).show(context);
+                        }
+                      }
+                    },
                     child: const Text('TRACK YOUR ORDER'),
                   ),
                 ),

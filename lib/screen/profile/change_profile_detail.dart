@@ -193,7 +193,6 @@ class _ChangeProfileDetailPageState extends State<ChangeProfileDetailPage> {
                         if (widget.beChanged == 'Email') {
                           var loginMethod =
                               await authProv.checkLoginMethod(oldEmail);
-                          print(loginMethod);
                           if (loginMethod.contains('google.com') && mounted) {
                             isLinkedToGoolge = true;
                             ScaffoldMessenger.of(context).showSnackBar(

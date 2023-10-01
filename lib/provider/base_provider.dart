@@ -18,6 +18,5 @@ class BaseProvider extends ChangeNotifier {
 
   set state(ConnectionState state) {
     _state = state;
-    // 5notifyListeners();
   }
 }

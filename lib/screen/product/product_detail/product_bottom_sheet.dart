@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:satria_optik/model/cart.dart';
 import 'package:satria_optik/provider/cart_provider.dart';
 import 'package:satria_optik/provider/product_detail_provider.dart';
+import 'package:satria_optik/utils/custom_function.dart';
 
 import '../../../../model/glass_frame.dart';
 import '../../../../model/lens.dart';
@@ -41,12 +42,22 @@ class ProductDetailBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Map<String, dynamic> eyeCondition = {};
+    List<double> eyes = List.generate(50, (index) => 0.25 * index);
+    for (var eye in eyes) {
+      eyeCondition['$eye'] = 50000 * eye;
+    }
+
     String? selectedColor;
     double totalPrice = frame.price?.toDouble() ?? 0;
-    double leftAdditionalPrice = 0;
-    double rightAdditionalPrice = 0;
-    double leftAdditionalPriceP = 0;
-    double rightAdditionalPriceP = 0;
+    double leftAdditionalPrice =
+        eyeCondition['${minusData?.leftEyeMinus}'] ?? 0;
+    double rightAdditionalPrice =
+        eyeCondition['${minusData?.rightEyeMinus}'] ?? 0;
+    double leftAdditionalPriceP =
+        eyeCondition['${minusData?.leftEyePlus}'] ?? 0;
+    double rightAdditionalPriceP =
+        eyeCondition['${minusData?.rightEyePlus}'] ?? 0;
     bool nearsightedValue = false;
     if (isMinus != null && isMinus!) {
       nearsightedValue = true;
@@ -234,7 +245,7 @@ class ProductDetailBottomSheet extends StatelessWidget {
                                                           .toDouble();
                                                 },
                                                 child: Text(
-                                                  '${e.name} +IDR${e.price}',
+                                                  '${e.name} +IDR${Format.formatToRupiah(e.price)}',
                                                   style: const TextStyle(
                                                     fontSize: 15,
                                                     fontWeight:
@@ -263,6 +274,10 @@ class ProductDetailBottomSheet extends StatelessWidget {
                                     value: nearsightedValue,
                                     onChanged: (_) {
                                       nearsightedValue = !nearsightedValue;
+                                      if (!nearsightedValue) {
+                                        totalPrice = frame.price!.toDouble() +
+                                            lensType.price!.toDouble();
+                                      }
                                       setState(() {});
                                     }),
                               ],
@@ -276,38 +291,34 @@ class ProductDetailBottomSheet extends StatelessWidget {
                                       leftMinus = p0.toString();
 
                                       totalPrice -= leftAdditionalPrice;
-                                      leftAdditionalPrice = 0;
-                                      leftAdditionalPrice = 50000 * p0!;
+                                      leftAdditionalPrice = eyeCondition['$p0'];
                                       totalPrice += leftAdditionalPrice;
-
                                       setState(() {});
                                     },
                                     onChangedRight: (p0) {
                                       rightMinus = p0.toString();
 
                                       totalPrice -= rightAdditionalPrice;
-                                      rightAdditionalPrice = 0;
-                                      rightAdditionalPrice = 50000 * p0!;
+                                      rightAdditionalPrice =
+                                          eyeCondition['$p0'];
                                       totalPrice += rightAdditionalPrice;
-
                                       setState(() {});
                                     },
                                     onChangedLeftP: (p0) {
                                       leftPlus = p0.toString();
 
                                       totalPrice -= leftAdditionalPriceP;
-                                      leftAdditionalPriceP = 0;
-                                      leftAdditionalPriceP = 50000 * p0!;
+                                      leftAdditionalPriceP =
+                                          eyeCondition['$p0'];
                                       totalPrice += leftAdditionalPriceP;
-
                                       setState(() {});
                                     },
                                     onChangedRightP: (p0) {
                                       rightPlus = p0.toString();
 
                                       totalPrice -= rightAdditionalPriceP;
-                                      rightAdditionalPriceP = 0;
-                                      rightAdditionalPriceP = 50000 * p0!;
+                                      rightAdditionalPriceP =
+                                          eyeCondition['$p0'];
                                       totalPrice += rightAdditionalPriceP;
 
                                       setState(() {});
@@ -329,7 +340,7 @@ class ProductDetailBottomSheet extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  '$totalPrice',
+                                  Format.formatToRupiah(totalPrice.toInt()),
                                   style: const TextStyle(
                                     color: Colors.red,
                                     fontSize: 25,
@@ -359,28 +370,25 @@ class ProductDetailBottomSheet extends StatelessWidget {
                                             },
                                           );
 
-                                          if (page == 'cart') {
-                                            cartProv.setToUpdate(true);
-                                          }
+                                          var newCartProduct = Cart(
+                                              id: cart?.id,
+                                              product: frameType,
+                                              lens: lensType,
+                                              color: selectedColor ?? '',
+                                              minusData: MinusData(
+                                                leftEyeMinus: leftMinus,
+                                                rightEyeMinus: rightMinus,
+                                                leftEyePlus: leftPlus,
+                                                rightEyePlus: rightPlus,
+                                                recipePath: frameProv.imagePath,
+                                              ),
+                                              totalPrice: totalPrice);
                                           await cartProv
                                               .addToCart(
-                                                Cart(
-                                                  id: cart?.id,
-                                                  product: frameType,
-                                                  lens: lensType,
-                                                  color: selectedColor ?? '',
-                                                  minusData: MinusData(
-                                                    leftEyeMinus: leftMinus,
-                                                    rightEyeMinus: rightMinus,
-                                                    leftEyePlus: leftPlus,
-                                                    rightEyePlus: rightPlus,
-                                                    recipePath:
-                                                        frameProv.imagePath,
-                                                  ),
-                                                  totalPrice: totalPrice,
-                                                ),
+                                                newCartProduct,
                                                 File(frameProv.image?.path ??
                                                     ''),
+                                                page == 'cart',
                                               )
                                               .then(
                                                 (value) {
@@ -389,7 +397,7 @@ class ProductDetailBottomSheet extends StatelessWidget {
                                                     cartProv.getCart(cart!);
                                                   }
                                                   cartProv.carts
-                                                      ?.where((element) {
+                                                      .where((element) {
                                                     if (cart?.id ==
                                                         element.id) {}
                                                     return false;

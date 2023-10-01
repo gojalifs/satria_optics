@@ -1,7 +1,7 @@
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:satria_optik/utils/custom_function.dart';
 
 import '../../model/cart.dart';
 import '../../provider/cart_provider.dart';
@@ -10,20 +10,21 @@ import '../checkout/checkout_screen.dart';
 import '../product/product_detail/product_bottom_sheet.dart';
 import '../product/product_detail/product_detail_screen.dart';
 
-class CartPage extends StatelessWidget {
+class CartPage extends StatefulWidget {
   static String routeName = '/cart';
   const CartPage({super.key});
 
   @override
+  State<CartPage> createState() => _CartPageState();
+}
+
+class _CartPageState extends State<CartPage> {
+  int total = 0;
+
+  List<Cart> checkoutList = [];
+  int totalPrice = 0;
+  @override
   Widget build(BuildContext context) {
-    int total = 0;
-    NumberFormat formatToRupiah = NumberFormat.currency(
-      locale: 'id',
-      symbol: 'IDR',
-    );
-
-    List<Cart> checkoutList = [];
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Cart'),
@@ -64,7 +65,7 @@ class CartPage extends StatelessWidget {
                         int subTotal = cart.totalPrice!.toInt();
 
                         String formattedSubTotal =
-                            formatToRupiah.format(subTotal);
+                            Format.formatToRupiah(subTotal);
 
                         return InkWell(
                           onTap: () {
@@ -77,20 +78,19 @@ class CartPage extends StatelessWidget {
                             child: Row(
                               children: [
                                 Checkbox.adaptive(
-                                  value: cart.isChecked,
+                                  value: checkoutList.contains(cart),
                                   onChanged: (value) {
                                     if (value!) {
                                       checkoutList.add(cart);
                                       total += cart.totalPrice?.toInt() ?? 0;
-                                      cartProv.setTotal(total.toDouble());
-                                      cartProv.addCheckouts(cart);
+                                      totalPrice = total;
                                     } else {
                                       checkoutList.remove(cart);
                                       total -= cart.totalPrice?.toInt() ?? 0;
-                                      cartProv.setTotal(total.toDouble());
-                                      cartProv.removeCheckouts(cart);
+                                      totalPrice = total;
                                     }
-                                    cart.isChecked = !cart.isChecked!;
+                                    !value;
+                                    setState(() {});
                                   },
                                 ),
                                 const SizedBox(width: 10),
@@ -114,7 +114,8 @@ class CartPage extends StatelessWidget {
                                         ),
                                       ),
                                       Text(
-                                        '${cart.product.price}',
+                                        Format.formatToRupiah(
+                                            cart.product.price),
                                         style: const TextStyle(
                                           color: Colors.red,
                                         ),
@@ -137,7 +138,8 @@ class CartPage extends StatelessWidget {
                                             ),
                                           ),
                                           Text(
-                                            ' IDR${cart.lens.price}',
+                                            Format.formatToRupiah(
+                                                cart.lens.price),
                                             style: const TextStyle(
                                               color: Colors.red,
                                             ),
@@ -213,18 +215,12 @@ class CartPage extends StatelessWidget {
                             color: Colors.white,
                           ),
                           child: Center(
-                            child: Consumer<CartProvider>(
-                              builder: (context, value, child) {
-                                var totalPrice =
-                                    formatToRupiah.format(value.totalPrice);
-                                return Text(
-                                  'Total $totalPrice',
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                );
-                              },
+                            child: Text(
+                              'Total ${Format.formatToRupiah(totalPrice)}',
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),
@@ -233,12 +229,12 @@ class CartPage extends StatelessWidget {
                         child: Consumer<CartProvider>(
                           builder: (context, value, child) {
                             return InkWell(
-                              onTap: value.checkouts.isEmpty
+                              onTap: checkoutList.isEmpty
                                   ? null
                                   : () {
                                       Navigator.of(context).pushNamed(
                                         CheckoutPage.routeName,
-                                        arguments: value.checkouts,
+                                        arguments: checkoutList,
                                       );
                                     },
                               child: Container(

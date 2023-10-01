@@ -32,7 +32,16 @@ class EyeCondition extends StatefulWidget {
 class _EyeConditionState extends State<EyeCondition> {
   int quantity = 1;
   String filePath = '';
-  List<double> eye = List.generate(50, (index) => 0.25 * index);
+  Map<String, dynamic> eyeCondition = {};
+  List<double> eyes = List.generate(50, (index) => 0.25 * index);
+
+  @override
+  void initState() {
+    for (var eye in eyes) {
+      eyeCondition['$eye'] = 50000 * eye;
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +69,7 @@ class _EyeConditionState extends State<EyeCondition> {
                     validator: (value) {
                       return value == null ? 'field required' : null;
                     },
-                    items: eye
+                    items: eyes
                         .map(
                           (e) => DropdownMenuItem(
                             value: e,
@@ -86,7 +95,7 @@ class _EyeConditionState extends State<EyeCondition> {
                     validator: (value) {
                       return value == null ? 'field required' : null;
                     },
-                    items: eye
+                    items: eyes
                         .map(
                           (e) => DropdownMenuItem(
                             value: e,
@@ -152,7 +161,7 @@ class _EyeConditionState extends State<EyeCondition> {
                     validator: (value) {
                       return value == null ? 'field required' : null;
                     },
-                    items: eye
+                    items: eyes
                         .map(
                           (e) => DropdownMenuItem(
                             value: e,
@@ -178,7 +187,7 @@ class _EyeConditionState extends State<EyeCondition> {
                     validator: (value) {
                       return value == null ? 'field required' : null;
                     },
-                    items: eye
+                    items: eyes
                         .map(
                           (e) => DropdownMenuItem(
                             value: e,

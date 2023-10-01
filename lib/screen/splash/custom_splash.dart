@@ -62,7 +62,4 @@ class _SplashPageState extends State<SplashPage> {
       ),
     );
   }
-
-  /// TODO pindahkan get user ini ke provider atau ke login, biar ga null saat relog
-  /// mungkin bisa dibuatkan auth provider, biar login logout juga disitu
 }

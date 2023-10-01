@@ -43,7 +43,8 @@ class PaymentWebView extends StatelessWidget {
             else if (change.url!.contains('deeplink')) {
               await provider.getPaymentStatus(id);
               await provider.updatePaymentStatus(id, 'Pending');
-            } else if (change.url!.contains('success')) {
+            } else if (change.url!.contains('success') ||
+                change.url!.contains('status_code=200')) {
               await provider.getPaymentStatus(id);
               await provider.updatePaymentStatus(id, 'Paid');
               await provider.updateDeliveryStatus(id, 'Packing Your Package');

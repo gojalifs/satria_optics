@@ -52,7 +52,6 @@ class UserHelper extends FirestoreHelper {
   Future updateUser(Map<String, dynamic> data) async {
     try {
       if (data.keys.contains('email')) {
-        print('update email');
         final user = await FirebaseAuth.instance.authStateChanges().first;
         await user?.updateEmail(data['email']);
       }

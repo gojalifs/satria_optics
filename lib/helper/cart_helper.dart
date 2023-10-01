@@ -103,7 +103,7 @@ class CartHelper extends FirestoreHelper {
     }
   }
 
-  Future addToCart(Cart cart, File file, bool isUpdate) async {
+  Future<String> addToCart(Cart cart, File file, bool isUpdate) async {
     DocumentReference<Map<String, dynamic>> cartRef;
     if (isUpdate) {
       cartRef =
@@ -150,6 +150,8 @@ class CartHelper extends FirestoreHelper {
         throw 'error while adding to cart';
       }
     }
+
+    return docId;
   }
 
   Future removeFromCart(Cart cart) async {

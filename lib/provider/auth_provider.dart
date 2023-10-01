@@ -84,12 +84,7 @@ class AuthProvider extends BaseProvider {
     state = ConnectionState.active;
 
     try {
-      print(FirebaseAuth.instance.currentUser?.providerData.map((e) {
-        e.providerId;
-        return e.providerId;
-      }));
       await FirebaseAuth.instance.currentUser?.unlink("google.com");
-      print('success');
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case "no-such-provider":

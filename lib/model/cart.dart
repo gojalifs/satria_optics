@@ -8,7 +8,6 @@ class Cart {
   GlassFrame product;
   Lens lens;
   String color;
-  bool? isChecked;
   MinusData? minusData;
 
   double? totalPrice;
@@ -18,7 +17,6 @@ class Cart {
     required this.product,
     required this.lens,
     required this.color,
-    this.isChecked = false,
     this.minusData,
     this.totalPrice,
   });
@@ -29,7 +27,6 @@ class Cart {
       'product': product.toMap(),
       'lens': lens.toMap(),
       'color': color,
-      'isChecked': isChecked,
       'minusData': minusData?.toMap(),
       'totalPrice': totalPrice,
     };
@@ -41,7 +38,6 @@ class Cart {
       product: GlassFrame.fromMap(map['product']),
       lens: Lens.fromMap(map['lens']),
       color: map['color'] ?? '',
-      isChecked: map['isChecked'],
       minusData:
           map['minusData'] != null ? MinusData.fromMap(map['minusData']) : null,
       totalPrice: map['totalPrice']?.toDouble(),
@@ -61,7 +57,6 @@ class Cart {
         other.product == product &&
         other.lens == lens &&
         other.color == color &&
-        other.isChecked == isChecked &&
         other.minusData == minusData &&
         other.totalPrice == totalPrice;
   }
@@ -72,7 +67,6 @@ class Cart {
         product.hashCode ^
         lens.hashCode ^
         color.hashCode ^
-        isChecked.hashCode ^
         minusData.hashCode ^
         totalPrice.hashCode;
   }

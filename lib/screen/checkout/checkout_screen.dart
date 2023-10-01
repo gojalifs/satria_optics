@@ -26,7 +26,7 @@ class CheckoutPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final MidtransHelper midtransHelper = MidtransHelper();
-    final formatter = Format();
+
     int total = products
             .map((e) => e.totalPrice)
             .reduce((value, element) => value! + element!)
@@ -164,7 +164,7 @@ class CheckoutPage extends StatelessWidget {
                                       children: [
                                         Expanded(
                                           child: Text(
-                                            formatter.formatToRupiah(
+                                            Format.formatToRupiah(
                                                 cart.product.price!),
                                             style: const TextStyle(
                                               color: Colors.white54,
@@ -191,7 +191,7 @@ class CheckoutPage extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(cart.lens.name!),
-                              Text(formatter.formatToRupiah(cart.lens.price!)),
+                              Text(Format.formatToRupiah(cart.lens.price!)),
                             ],
                           ),
                           if (cart.minusData?.leftEyeMinus != null &&
@@ -224,8 +224,8 @@ class CheckoutPage extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text('Sub Total'),
-                              Text(formatter
-                                  .formatToRupiah(cart.totalPrice!.toInt())),
+                              Text(Format.formatToRupiah(
+                                  cart.totalPrice!.toInt())),
                             ],
                           ),
                           if (products.length != index + 1)
@@ -273,28 +273,28 @@ class CheckoutPage extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text('Total'),
-                              Text(formatter.formatToRupiah(total)),
+                              Text(Format.formatToRupiah(total)),
                             ],
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text('Shipping Fee'),
-                              Text(formatter.formatToRupiah(shipFee)),
+                              Text(Format.formatToRupiah(shipFee)),
                             ],
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text('Discount'),
-                              Text(formatter.formatToRupiah(discount)),
+                              Text(Format.formatToRupiah(discount)),
                             ],
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text('Grand Total'),
-                              Text(formatter.formatToRupiah(grandTotal)),
+                              Text(Format.formatToRupiah(grandTotal)),
                             ],
                           ),
                         ],
@@ -344,6 +344,8 @@ class CheckoutPage extends StatelessWidget {
                             await transactProv.updatePaymentData(
                                 orderId, orderId, transactData['redirect_url']);
                             if (context.mounted) {
+                              Provider.of<CartProvider>(context, listen: false)
+                                  .removeFromProvider(products);
                               Navigator.of(context).pushNamed(
                                 PaymentWebView.routeName,
                                 arguments: {
