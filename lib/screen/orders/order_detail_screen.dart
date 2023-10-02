@@ -98,8 +98,6 @@ class OrderDetailPage extends StatelessWidget {
                                     ),
                                     margin: const EdgeInsets.only(right: 10),
                                     child: Image.network(
-                                      // order.cartProduct?[0].product
-                                      //     .colors?[order.cartProduct?[0].color]
                                       order.cartProduct![0].product.colors![0]
                                           .url!,
                                       fit: BoxFit.cover,

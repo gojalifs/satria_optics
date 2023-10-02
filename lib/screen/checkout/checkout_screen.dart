@@ -99,12 +99,12 @@ class CheckoutPage extends StatelessWidget {
                                         const TextStyle(color: Colors.white60),
                                   ),
                                   Text(
-                                    '${value.selectedAddress!.detail} jbferwfbjkesn fjkasfnj',
+                                    '${value.selectedAddress!.detail} ${value.selectedAddress?.city}',
                                     style:
                                         const TextStyle(color: Colors.white60),
                                   ),
                                   Text(
-                                    value.selectedAddress!.city,
+                                    '${value.selectedAddress?.province} ${value.selectedAddress?.postalCode}',
                                     style: const TextStyle(
                                       color: Colors.white60,
                                       fontSize: 15,
