@@ -11,9 +11,12 @@ class Format {
     return formatToRupiah.format(data);
   }
 
-  static String timeFormat(Timestamp time) {
+  static String timeFormat(Timestamp? time) {
     DateFormat timestampFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
-    String formatted = timestampFormat.format(time.toDate());
-    return formatted;
+    if (time != null) {
+      String formatted = timestampFormat.format(time.toDate());
+      return formatted;
+    }
+    return '';
   }
 }

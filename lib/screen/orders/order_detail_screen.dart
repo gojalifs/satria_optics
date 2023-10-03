@@ -30,6 +30,29 @@ class OrderDetailPage extends StatelessWidget {
         appBar: AppBar(
           title: const Text('Your Order Detail'),
         ),
+        floatingActionButton: Consumer<OrderProvider>(
+          builder: (context, value, child) {
+            if (value.order.orderStatus != 'waitingPayment') {
+              return FloatingActionButton.extended(
+                onPressed: () async {
+                  var url = Uri.parse(
+                      'https://cekresi.com/?noresi=${value.order.receiptNumber}');
+                  if (!await launchUrl(url)) {
+                    if (context.mounted) {
+                      CherryToast.error(
+                        toastPosition: Position.bottom,
+                        title: const Text("Couldn't track receipt number"),
+                      ).show(context);
+                    }
+                  }
+                },
+                label: const Text('TRACK ORDER'),
+              );
+            } else {
+              return const SizedBox();
+            }
+          },
+        ),
         body: Stack(
           children: [
             Consumer<OrderProvider>(
@@ -252,9 +275,10 @@ class OrderDetailPage extends StatelessWidget {
                                               ),
                                       ),
                                 _DetailRow(
-                                    title: 'Order Finish At',
-                                    detail: order.orderFinishTime?.toString() ??
-                                        'Not Yet Finished'),
+                                  title: 'Order Finish At',
+                                  detail:
+                                      Format.timeFormat(order.orderFinishTime),
+                                ),
                                 const Text(
                                   'Tap This Card To Refresh Payment Information',
                                   style: TextStyle(
@@ -264,6 +288,18 @@ class OrderDetailPage extends StatelessWidget {
                               ],
                             ),
                           ),
+                        ),
+                      ),
+                      Consumer<OrderProvider>(
+                        builder: (context, value, child) => ElevatedButton(
+                          onPressed: value.delivering.contains(value.order)
+                              ? () {
+                                  value.markAsCompleted();
+                                }
+                              : null,
+                          child: value.state == ConnectionState.active
+                              ? const CircularProgressIndicator()
+                              : const Text('Mark As Finished'),
                         ),
                       ),
                       if (order.paymentStatus == null ||
@@ -325,30 +361,6 @@ class OrderDetailPage extends StatelessWidget {
                   ),
                 );
               },
-            ),
-            Padding(
-              key: key,
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: Consumer<OrderProvider>(
-                  builder: (context, value, child) => ElevatedButton(
-                    onPressed: () async {
-                      var url = Uri.parse(
-                          'https://cekresi.com/?noresi=${value.order.receiptNumber}');
-                      if (!await launchUrl(url)) {
-                        if (context.mounted) {
-                          CherryToast.error(
-                            toastPosition: Position.bottom,
-                            title: const Text("Couldn't track receipt number"),
-                          ).show(context);
-                        }
-                      }
-                    },
-                    child: const Text('TRACK YOUR ORDER'),
-                  ),
-                ),
-              ),
             ),
           ],
         ),

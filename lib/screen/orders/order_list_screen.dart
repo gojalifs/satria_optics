@@ -12,7 +12,8 @@ enum OrderStatus {
   packing,
   // ignore: constant_identifier_names
   Shipping,
-  completed,
+  // ignore: constant_identifier_names
+  Done,
   cancelled,
 }
 
@@ -26,7 +27,7 @@ class Orderspage extends StatelessWidget {
         CustomTabbarWidget(status: OrderStatus.waitingPayment.name),
         CustomTabbarWidget(status: OrderStatus.packing.name),
         CustomTabbarWidget(status: OrderStatus.Shipping.name),
-        CustomTabbarWidget(status: OrderStatus.completed.name),
+        CustomTabbarWidget(status: OrderStatus.Done.name),
         CustomTabbarWidget(status: OrderStatus.cancelled.name),
       ],
     );
@@ -47,7 +48,6 @@ class CustomTabbarWidget extends StatelessWidget {
         await Provider.of<OrderProvider>(context, listen: false)
             .getOrdersByStatus(status);
       },
-      refreshOnStart: true,
       child: Consumer<OrderProvider>(
         builder: (context, value, child) {
           List<Transactions> orders = [];
@@ -71,7 +71,7 @@ class CustomTabbarWidget extends StatelessWidget {
             case 'Shipping':
               orders = value.delivering;
               break;
-            case 'completed':
+            case 'Done':
               orders = value.completed;
               break;
             case 'cancelled':
@@ -82,9 +82,11 @@ class CustomTabbarWidget extends StatelessWidget {
 
           if (orders.isEmpty) {
             return ListView(
+              padding: const EdgeInsets.symmetric(vertical: 20),
               children: const [
                 Center(
-                  child: Text("You don't have any order(s)"),
+                  child:
+                      Text("You don't have any order(s). Pull down to retry"),
                 ),
               ],
             );

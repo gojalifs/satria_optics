@@ -1,16 +1,20 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:satria_optik/helper/firestore_helper.dart';
 import 'package:satria_optik/helper/midtrans_helper.dart';
 import 'package:satria_optik/model/transactions.dart';
 import 'package:http/http.dart' as http;
 
 class OrderHelper extends FirestoreHelper {
+  var userId = FirebaseAuth.instance.currentUser?.uid;
+
   Future<List<Transactions>> getOrders(status) async {
     List<Transactions> orders = [];
+    print('$userID $userId $status');
     var ordersRef =
-        db.collection('users').doc(userID).collection('transactions');
+        db.collection('users').doc(userId).collection('transactions');
     var query = await ordersRef
         .where('orderStatus', isEqualTo: status)
         .orderBy('orderMadeTime', descending: true)
@@ -30,7 +34,7 @@ class OrderHelper extends FirestoreHelper {
   Future<Transactions> getOrder(String id) async {
     Map<String, dynamic> orderMap = {};
     var orderRef =
-        db.collection('users').doc(userID).collection('transactions').doc(id);
+        db.collection('users').doc(userId).collection('transactions').doc(id);
     var data = await orderRef.get();
     var address = data['address'] as DocumentReference<Map<String, dynamic>>;
     orderMap = data.data()!;
@@ -66,7 +70,7 @@ class OrderHelper extends FirestoreHelper {
   }) async {
     var orderRef = db
         .collection('users')
-        .doc(userID)
+        .doc(userId)
         .collection('transactions')
         .doc(transactId);
     try {
@@ -84,13 +88,35 @@ class OrderHelper extends FirestoreHelper {
   Future updateDeliveryStatus(String transactId, String status) async {
     var orderRef = db
         .collection('users')
-        .doc(userID)
+        .doc(userId)
         .collection('transactions')
         .doc(transactId);
     try {
       await orderRef.update({'deliveryStatus': status});
     } catch (e) {
       throw 'Something error happened';
+    }
+  }
+
+  Future markAsCompleted(String transactId) async {
+    var orderRef = db
+        .collection('users')
+        .doc(userId)
+        .collection('transactions')
+        .doc(transactId);
+
+    try {
+      await orderRef.update(
+        {
+          'orderStatus': 'Done',
+          'orderFinishTime': timestamp,
+          'deliveryStatus': 'Shipped',
+        },
+      );
+    } on FirebaseException catch (e) {
+      throw 'error happened. code ${e.code}';
+    } catch (e) {
+      throw 'error happened';
     }
   }
 }

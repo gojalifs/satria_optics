@@ -46,7 +46,7 @@ class OrderProvider extends ChangeNotifier {
         case 'Shipping':
           _delivering = orders;
           break;
-        case 'completed':
+        case 'Done':
           _completed = orders;
           break;
         case 'cancelled':
@@ -118,5 +118,22 @@ class OrderProvider extends ChangeNotifier {
     _order = _order.copyWith(deliveryStatus: status);
 
     notifyListeners();
+  }
+
+  markAsCompleted() async {
+    _state = ConnectionState.active;
+    try {
+      notifyListeners();
+      await _helper.markAsCompleted(_order.id!);
+      _delivering.remove(_order);
+      _order = _order.copyWith(orderStatus: 'Done');
+      _completed.add(_order);
+      print('done');
+    } catch (e) {
+      rethrow;
+    } finally {
+      _state = ConnectionState.done;
+      notifyListeners();
+    }
   }
 }
