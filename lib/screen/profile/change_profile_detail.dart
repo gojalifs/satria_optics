@@ -27,6 +27,7 @@ class ChangeProfileDetailPage extends StatefulWidget {
 class _ChangeProfileDetailPageState extends State<ChangeProfileDetailPage> {
   TextEditingController controller = TextEditingController();
   TextEditingController passController = TextEditingController();
+  var newPassController = TextEditingController();
   UserHelper userHelper = UserHelper();
 
   final formKey = GlobalKey<FormState>();
@@ -39,7 +40,11 @@ class _ChangeProfileDetailPageState extends State<ChangeProfileDetailPage> {
 
   @override
   void initState() {
-    controller = TextEditingController(text: widget.data);
+    if (widget.beChanged == 'Password') {
+      controller = TextEditingController(text: '');
+    } else {
+      controller = TextEditingController(text: widget.data);
+    }
     genderValue = widget.data;
     oldEmail = widget.data;
 
@@ -62,15 +67,20 @@ class _ChangeProfileDetailPageState extends State<ChangeProfileDetailPage> {
           child: ListView(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             children: [
-              Text('Change your ${widget.beChanged}'),
               if (widget.beChanged.toLowerCase() == 'email')
                 const Text(
                   '''If you change your email, you must using email and'''
                   ''' password on your next login, or you must connect again to google''',
                   style: TextStyle(color: Colors.grey),
                 ),
+              if (widget.beChanged.toLowerCase() == 'password')
+                const Text(
+                  "You can't change your password if you register using google",
+                  style: TextStyle(color: Colors.grey),
+                ),
               const SizedBox(height: 20),
-              if (widget.beChanged != 'Gender')
+              if (widget.beChanged != 'Gender' &&
+                  widget.beChanged != 'Password')
                 CustomTextFormField(
                   controller: controller,
                   label: widget.beChanged,
@@ -89,9 +99,10 @@ class _ChangeProfileDetailPageState extends State<ChangeProfileDetailPage> {
                       : null,
                 ),
               const SizedBox(height: 20),
-              if (widget.beChanged.toLowerCase() == 'email')
+              if (widget.beChanged == 'Email' || widget.beChanged == 'Password')
                 TextFormField(
                   controller: passController,
+                  autofillHints: const [AutofillHints.password],
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please fill password';
@@ -99,7 +110,36 @@ class _ChangeProfileDetailPageState extends State<ChangeProfileDetailPage> {
                     return null;
                   },
                   decoration: InputDecoration(
-                    labelText: 'Password',
+                    labelText: 'Old Password',
+                    labelStyle: Theme.of(context).textTheme.labelLarge,
+                    suffix: IconButton(
+                      onPressed: () {
+                        isVisible = !isVisible;
+                        isObscure = !isObscure;
+                        setState(() {});
+                      },
+                      icon: Icon(
+                        isVisible
+                            ? Icons.visibility_off_rounded
+                            : Icons.visibility_rounded,
+                      ),
+                    ),
+                  ),
+                  obscureText: isObscure,
+                ),
+              const SizedBox(height: 20),
+              if (widget.beChanged == 'Password')
+                TextFormField(
+                  controller: newPassController,
+                  autofillHints: const [AutofillHints.newPassword],
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please fill new password';
+                    }
+                    return null;
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'New Password',
                     labelStyle: Theme.of(context).textTheme.labelLarge,
                     suffix: IconButton(
                       onPressed: () {
@@ -208,12 +248,19 @@ class _ChangeProfileDetailPageState extends State<ChangeProfileDetailPage> {
                           }
                         }
 
-                        if (widget.beChanged.toLowerCase() == 'email') {
+                        if (widget.beChanged == 'Email') {
                           await authProv.signWithPassword(
                               oldEmail, passController.text);
                         }
-
-                        await userProv.updateUser(changedData);
+                        if (widget.beChanged == 'Password') {
+                          await authProv.updatePassword(
+                            userProv.userProfile?.email,
+                            passController.text,
+                            newPassController.text,
+                          );
+                        } else {
+                          await userProv.updateUser(changedData);
+                        }
 
                         if (mounted) {
                           Navigator.pop(context);

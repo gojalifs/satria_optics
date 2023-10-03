@@ -65,6 +65,19 @@ class AuthProvider extends BaseProvider {
     }
   }
 
+  updatePassword(String? email, String oldPassword, String newPassword) async {
+    state = ConnectionState.active;
+    print('email$email');
+    try {
+      await signWithPassword(email!, oldPassword);
+      await _authHelper.updatePassword(oldPassword, newPassword);
+    } catch (e) {
+      rethrow;
+    } finally {
+      state = ConnectionState.done;
+    }
+  }
+
   Future<UserCredential> registerWithEmail(String name, String email,
       String phone, String password, String birth, String gender) async {
     try {

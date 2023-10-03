@@ -104,16 +104,20 @@ class ProfilePage extends StatelessWidget {
                     detail: user.username ?? '',
                   ),
                   UserInformationWidgetTile(
-                    title: 'Email',
-                    detail: user.email ?? '',
-                  ),
-                  UserInformationWidgetTile(
                     title: 'Phone',
                     detail: user.phone ?? '',
                   ),
                   UserInformationWidgetTile(
                     title: 'Gender',
                     detail: user.gender ?? '',
+                  ),
+                  UserInformationWidgetTile(
+                    title: 'Email',
+                    detail: user.email ?? '',
+                  ),
+                  const UserInformationWidgetTile(
+                    title: 'Password',
+                    detail: 'change password here',
                   ),
                   const Divider(),
                   InkWell(

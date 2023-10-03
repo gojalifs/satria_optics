@@ -89,6 +89,16 @@ class AuthHelper extends FirestoreHelper {
     }
   }
 
+  Future updatePassword(String oldPassword, String newPassword) async {
+    try {
+      await FirebaseAuth.instance.currentUser?.updatePassword(newPassword);
+    } on FirebaseAuthException catch (e) {
+      throw 'Error While changing your password. code ${e.code}';
+    } catch (_) {
+      throw 'Error While changing your password.';
+    }
+  }
+
   Future<UserCredential> registerEmail(String name, String email, String phone,
       String password, String birth, String gender) async {
     UserProfile user = UserProfile(
