@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:satria_optik/provider/auth_provider.dart';
+import 'package:satria_optik/provider/chat_provider.dart';
 import 'package:satria_optik/screen/auth/tos_screen.dart';
 import 'package:satria_optik/screen/profile/avatar_screen.dart';
 
@@ -72,6 +73,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => FavoriteProvider()),
         ChangeNotifierProvider(create: (context) => TransactionProvider()),
         ChangeNotifierProvider(create: (context) => OrderProvider()),
+        ChangeNotifierProvider(create: (context) => ChatProvider()),
       ],
       child: MaterialApp(
         title: 'Flutter Demo',

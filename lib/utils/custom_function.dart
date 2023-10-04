@@ -19,4 +19,13 @@ class Format {
     }
     return '';
   }
+
+  static String hourFormat(Timestamp? time) {
+    DateFormat dateFormat = DateFormat('HH:mm');
+    if (time != null) {
+      String formatted = dateFormat.format(time.toDate());
+      return formatted;
+    }
+    return '';
+  }
 }
