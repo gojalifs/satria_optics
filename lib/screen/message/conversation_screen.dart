@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:satria_optik/model/chat.dart';
 import 'package:satria_optik/provider/chat_provider.dart';
+import 'package:satria_optik/provider/user_provider.dart';
 import 'package:satria_optik/utils/custom_function.dart';
 
 class ConversationPage extends StatefulWidget {
@@ -16,12 +18,20 @@ class ConversationPage extends StatefulWidget {
 
 class _ConversationPageState extends State<ConversationPage> {
   final controller = TextEditingController();
-  var stream = FirebaseFirestore.instance
-      .collection('users')
-      .doc('4120VSJKzENrB9wNJ6CG1lTyao33')
-      .collection('chats')
-      .orderBy('timestamp')
-      .snapshots();
+  Stream<QuerySnapshot<Map<String, dynamic>>>? stream;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    var user = FirebaseAuth.instance.currentUser?.uid;
+    stream = FirebaseFirestore.instance
+        .collection('users')
+        .doc(user)
+        .collection('chats')
+        .orderBy('timestamp', descending: true)
+        .snapshots();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,42 +39,11 @@ class _ConversationPageState extends State<ConversationPage> {
       appBar: AppBar(
         title: const Text('Chat With Admin'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-        child: Stack(
-          children: [
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      controller: controller,
-                      onTapOutside: (event) {
-                        primaryFocus?.unfocus();
-                      },
-                      decoration: const InputDecoration(
-                        hintText: 'type message here...',
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: controller.text.isEmpty
-                        ? null
-                        : () {
-                            print('object');
-                            Provider.of<ChatProvider>(context, listen: false)
-                                .addNewChat(
-                              Chat(message: controller.text, sender: 'user'),
-                            );
-                            controller.clear();
-                          },
-                    icon: const Icon(Icons.send_rounded),
-                  ),
-                ],
-              ),
-            ),
-            StreamBuilder(
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 48),
+            child: StreamBuilder(
               stream: stream,
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
@@ -84,7 +63,11 @@ class _ConversationPageState extends State<ConversationPage> {
                 );
 
                 return ListView(
-                  // shrinkWrap: true,
+                  padding: const EdgeInsets.only(
+                    right: 16,
+                    left: 16,
+                  ),
+                  reverse: true,
                   children: snapshot.data!.docs.map((e) {
                     var chat = Chat.fromMap(e.data());
 
@@ -95,9 +78,52 @@ class _ConversationPageState extends State<ConversationPage> {
                   }).toList(),
                 );
               },
-            )
-          ],
-        ),
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    controller: controller,
+                    onChanged: (value) {
+                      print(controller.text);
+                      setState(() {});
+                    },
+                    decoration: const InputDecoration(
+                      hintText: 'type message here...',
+                    ),
+                  ),
+                ),
+                Consumer<UserProvider>(
+                  builder: (context, value, child) => IconButton(
+                    onPressed: controller.text.isEmpty
+                        ? null
+                        : () {
+                            print('object ${value.userProfile?.name}');
+                            Provider.of<ChatProvider>(context, listen: false)
+                                .addNewChat(
+                              Chat(
+                                  message: controller.text,
+                                  sender: 'user',
+                                  senderName: value.userProfile?.name),
+                            );
+                            controller.clear();
+                            setState(() {});
+                          },
+                    icon: Icon(
+                      Icons.send_rounded,
+                      color: controller.text.isEmpty
+                          ? Colors.white24
+                          : Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )
+        ],
       ),
     );
   }
@@ -205,47 +231,5 @@ class ChatBubble extends StatelessWidget {
         ),
       ],
     );
-
-    // return Container(
-    //   margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-    //   padding: const EdgeInsets.all(12.0),
-    //   decoration: BoxDecoration(
-    //     color: bgColor,
-    //     borderRadius: BorderRadius.only(
-    //       topLeft: Radius.circular(isSender ? 16.0 : 0),
-    //       topRight: Radius.circular(isSender ? 0 : 16.0),
-    //       bottomLeft: const Radius.circular(16.0),
-    //       bottomRight: const Radius.circular(16.0),
-    //     ),
-    //   ),
-    //   child: Column(
-    //     crossAxisAlignment:
-    //         isSender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-    //     children: [
-    //       Text(
-    //         message ?? '',
-    //         style: const TextStyle(
-    //           color: Colors.black,
-    //           fontSize: 16.0,
-    //         ),
-    //       ),
-    //       const SizedBox(height: 4.0),
-    //       Row(
-    //         mainAxisSize: MainAxisSize.min,
-    //         children: [
-    //           Text(
-    //             Format.timeFormat(timestamp),
-    //             style: const TextStyle(
-    //               color: Colors.black54,
-    //               fontSize: 12.0,
-    //             ),
-    //           ),
-    //           if (isSender)
-    //             const Icon(Icons.check, color: Colors.white, size: 16.0),
-    //         ],
-    //       ),
-    //     ],
-    //   ),
-    // );
   }
 }

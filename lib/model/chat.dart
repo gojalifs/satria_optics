@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Chat {
   final String? id;
   final String? sender;
+  final String? senderName;
   final String? senderId;
   final String? message;
   final Timestamp? timestamp;
@@ -10,6 +11,7 @@ class Chat {
   Chat({
     this.id,
     this.sender,
+    this.senderName,
     this.senderId,
     this.message,
     this.timestamp,
@@ -18,6 +20,7 @@ class Chat {
   Chat copyWith({
     String? id,
     String? sender,
+    String? senderName,
     String? senderId,
     String? message,
     Timestamp? timestamp,
@@ -25,6 +28,7 @@ class Chat {
     return Chat(
       id: id ?? this.id,
       sender: sender ?? this.sender,
+      senderName: senderName ?? this.senderName,
       senderId: senderId ?? this.senderId,
       message: message ?? this.message,
       timestamp: timestamp ?? this.timestamp,
@@ -45,6 +49,7 @@ class Chat {
     return {
       'id': id,
       'sender': sender,
+      'senderName': senderName,
       'senderId': senderId,
       'message': message,
       'timestamp': timestamp,
@@ -55,6 +60,7 @@ class Chat {
     return Chat(
       id: map['id'],
       sender: map['sender'],
+      senderName: map['senderName'],
       senderId: map['senderId'],
       message: map['message'],
       timestamp: map['timestamp'],
@@ -63,7 +69,7 @@ class Chat {
 
   @override
   String toString() {
-    return 'Chat(id: $id, sender: $sender, senderId: $senderId, message: $message, timestamp: $timestamp)';
+    return 'Chat(id: $id, sender: $sender, senderName: $senderName, senderId: $senderId, message: $message, timestamp: $timestamp)';
   }
 
   @override
@@ -73,6 +79,7 @@ class Chat {
     return other is Chat &&
         other.id == id &&
         other.sender == sender &&
+        other.senderName == senderName &&
         other.senderId == senderId &&
         other.message == message &&
         other.timestamp == timestamp;
@@ -82,6 +89,7 @@ class Chat {
   int get hashCode {
     return id.hashCode ^
         sender.hashCode ^
+        senderName.hashCode ^
         senderId.hashCode ^
         message.hashCode ^
         timestamp.hashCode;

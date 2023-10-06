@@ -4,7 +4,7 @@ import 'package:satria_optik/helper/firestore_helper.dart';
 import 'package:satria_optik/model/chat.dart';
 
 class ChatHelper extends FirestoreHelper {
-  final uid = FirebaseAuth.instance.currentUser?.uid;
+  var uid = FirebaseAuth.instance.currentUser?.uid;
   listenChat() {
     final ref = db.collection('users').doc(uid).collection('chats');
     ref.snapshots().listen((event) {
@@ -14,6 +14,7 @@ class ChatHelper extends FirestoreHelper {
 
   Future<String> newMessage(Chat chat) async {
     try {
+      print(uid);
       final ref = db.collection('users').doc(uid).collection('chats');
       chat = chat.copyWith(
         senderId: uid,
