@@ -8,7 +8,7 @@ class Format {
       symbol: 'Rp',
     );
 
-    return formatToRupiah.format(data);
+    return data != null ? formatToRupiah.format(data) : '-';
   }
 
   static String timeFormat(Timestamp? time) {

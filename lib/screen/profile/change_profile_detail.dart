@@ -34,7 +34,7 @@ class _ChangeProfileDetailPageState extends State<ChangeProfileDetailPage> {
 
   String? genderValue;
   String oldEmail = '';
-  bool isLinkedToGoolge = false;
+  bool isLinkedToGoogle = false;
   bool isVisible = false;
   bool isObscure = true;
 
@@ -78,7 +78,9 @@ class _ChangeProfileDetailPageState extends State<ChangeProfileDetailPage> {
                   "You can't change your password if you register using google",
                   style: TextStyle(color: Colors.grey),
                 ),
-              const SizedBox(height: 20),
+              if (widget.beChanged != 'Gender' &&
+                  widget.beChanged != 'Password')
+                const SizedBox(height: 20),
               if (widget.beChanged != 'Gender' &&
                   widget.beChanged != 'Password')
                 CustomTextFormField(
@@ -98,7 +100,8 @@ class _ChangeProfileDetailPageState extends State<ChangeProfileDetailPage> {
                         }
                       : null,
                 ),
-              const SizedBox(height: 20),
+              if (widget.beChanged == 'Email' || widget.beChanged == 'Password')
+                const SizedBox(height: 20),
               if (widget.beChanged == 'Email' || widget.beChanged == 'Password')
                 TextFormField(
                   controller: passController,
@@ -127,7 +130,8 @@ class _ChangeProfileDetailPageState extends State<ChangeProfileDetailPage> {
                   ),
                   obscureText: isObscure,
                 ),
-              const SizedBox(height: 20),
+              if (widget.beChanged == 'Email' || widget.beChanged == 'Password')
+                const SizedBox(height: 20),
               if (widget.beChanged == 'Password')
                 TextFormField(
                   controller: newPassController,
@@ -180,7 +184,8 @@ class _ChangeProfileDetailPageState extends State<ChangeProfileDetailPage> {
                     ),
                   ],
                 ),
-              const SizedBox(height: 20),
+              if (widget.beChanged != 'Email')
+                const SizedBox(height: 20),
               Consumer2<UserProvider, AuthProvider>(
                 builder: (context, userProv, authProv, child) => ElevatedButton(
                   onPressed: () async {
@@ -234,7 +239,7 @@ class _ChangeProfileDetailPageState extends State<ChangeProfileDetailPage> {
                           var loginMethod =
                               await authProv.checkLoginMethod(oldEmail);
                           if (loginMethod.contains('google.com') && mounted) {
-                            isLinkedToGoolge = true;
+                            isLinkedToGoogle = true;
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text(
@@ -280,7 +285,7 @@ class _ChangeProfileDetailPageState extends State<ChangeProfileDetailPage> {
                   child: const Text('Save'),
                 ),
               ),
-              if (isLinkedToGoolge)
+              if (isLinkedToGoogle)
                 Consumer<AuthProvider>(
                   builder: (context, value, child) => ElevatedButton(
                     onPressed: () async {
@@ -289,7 +294,7 @@ class _ChangeProfileDetailPageState extends State<ChangeProfileDetailPage> {
                           CustomLoadingAnimation.show(context);
                         }
                         await value.unlinkGoogle();
-                        isLinkedToGoolge = false;
+                        isLinkedToGoogle = false;
                       } catch (e) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('$e')),

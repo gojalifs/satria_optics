@@ -176,24 +176,33 @@ class ProductDetailBottomSheet extends StatelessWidget {
                                           ? 'field required'
                                           : null;
                                     },
-                                    items: colorName.map(
-                                      (e) {
-                                        return DropdownMenuItem(
-                                          value: e,
-                                          child: Text(
-                                            e,
-                                            style: const TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.normal,
+                                    items: colorName.isNotEmpty
+                                        ? colorName.map(
+                                            (e) {
+                                              return DropdownMenuItem(
+                                                value: e,
+                                                child: Text(
+                                                  e,
+                                                  style: const TextStyle(
+                                                    fontSize: 15,
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          ).toList()
+                                        : [
+                                            const DropdownMenuItem(
+                                              value: 'Original',
+                                              child: Text('Original'),
                                             ),
-                                          ),
-                                        );
-                                      },
-                                    ).toList(),
+                                          ],
                                     onChanged: (value) {
                                       selectedColor = value;
 
                                       setState(() {});
+                                      print(value);
                                     },
                                   ),
                                 ),
@@ -241,7 +250,8 @@ class ProductDetailBottomSheet extends StatelessWidget {
                                                 value: e,
                                                 onTap: () {
                                                   totalPrice =
-                                                      (frame.price! + e.price!)
+                                                      ((frame.price ?? 0) +
+                                                              (e.price ?? 0))
                                                           .toDouble();
                                                 },
                                                 child: Text(
@@ -275,8 +285,9 @@ class ProductDetailBottomSheet extends StatelessWidget {
                                     onChanged: (_) {
                                       nearsightedValue = !nearsightedValue;
                                       if (!nearsightedValue) {
-                                        totalPrice = frame.price!.toDouble() +
-                                            lensType.price!.toDouble();
+                                        totalPrice = (frame.price ?? 0)
+                                                .toDouble() +
+                                            (lensType.price ?? 0).toDouble();
                                       }
                                       setState(() {});
                                     }),
@@ -362,6 +373,7 @@ class ProductDetailBottomSheet extends StatelessWidget {
 
                                           showDialog(
                                             context: context,
+                                            barrierDismissible: false,
                                             builder: (context) {
                                               return LoadingAnimationWidget
                                                   .threeArchedCircle(
@@ -423,8 +435,8 @@ class ProductDetailBottomSheet extends StatelessWidget {
                                                 ),
                                               )
                                               .whenComplete(() {
-                                                totalPrice =
-                                                    frame.price!.toDouble();
+                                                totalPrice = (frame.price ?? 0)
+                                                    .toDouble();
                                                 nearsightedValue = false;
 
                                                 Navigator.of(context).pop();

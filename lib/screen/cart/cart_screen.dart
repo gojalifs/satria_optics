@@ -12,6 +12,7 @@ import '../product/product_detail/product_detail_screen.dart';
 
 class CartPage extends StatefulWidget {
   static String routeName = '/cart';
+
   const CartPage({super.key});
 
   @override
@@ -23,6 +24,7 @@ class _CartPageState extends State<CartPage> {
 
   List<Cart> checkoutList = [];
   int totalPrice = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -95,7 +97,10 @@ class _CartPageState extends State<CartPage> {
                                 ),
                                 const SizedBox(width: 10),
                                 Image.network(
-                                  cart.product.colors![0].url!,
+                                  cart.product.colors!.isNotEmpty &&
+                                          cart.product.colors?[0].url != null
+                                      ? cart.product.colors![0].url!
+                                      : 'https://firebasestorage.googleapis.com/v0/b/satria-jaya-optik.appspot.com/o/default%2Fbonbon-boy-with-red-hair-and-glasses.png?alt=media&token=53c99253-a46d-4f31-9851-48b6b76b1d54',
                                   width: 75,
                                   errorBuilder: (context, error, stackTrace) {
                                     return const Icon(Icons.image_rounded);
@@ -108,7 +113,7 @@ class _CartPageState extends State<CartPage> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        cart.product.name!,
+                                        cart.product.name ??'',
                                         style: const TextStyle(
                                           fontSize: 22,
                                         ),
@@ -132,7 +137,7 @@ class _CartPageState extends State<CartPage> {
                                         mainAxisSize: MainAxisSize.max,
                                         children: [
                                           Text(
-                                            cart.lens.name!,
+                                            cart.lens.name ??'',
                                             style: const TextStyle(
                                               color: Colors.white70,
                                             ),
@@ -182,7 +187,7 @@ class _CartPageState extends State<CartPage> {
                                   child: ProductDetailBottomSheet(
                                     frame: cart.product,
                                     colorName: cart.product.colors!
-                                        .map((e) => e.name!)
+                                        .map((e) => e.name ?? '')
                                         .toList(),
                                     page: 'cart',
                                     cart: cart,

@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:satria_optik/provider/order_provider.dart';
 import 'package:satria_optik/utils/custom_function.dart';
 
 import '../../helper/midtrans_helper.dart';
@@ -142,7 +144,10 @@ class CheckoutPage extends StatelessWidget {
                           Row(
                             children: [
                               Image.network(
-                                cart.product.colors![0].url!,
+                                cart.product.colors!.isNotEmpty &&
+                                        cart.product.colors?[0].url != null
+                                    ? cart.product.colors![0].url!
+                                    : 'https://firebasestorage.googleapis.com/v0/b/satria-jaya-optik.appspot.com/o/default%2Fbonbon-boy-with-red-hair-and-glasses.png?alt=media&token=53c99253-a46d-4f31-9851-48b6b76b1d54',
                                 width: 100,
                                 height: 100,
                               ),
@@ -152,7 +157,7 @@ class CheckoutPage extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      cart.product.name!,
+                                      cart.product.name ?? '',
                                       style: const TextStyle(fontSize: 20),
                                     ),
                                     Text(
@@ -165,7 +170,7 @@ class CheckoutPage extends StatelessWidget {
                                         Expanded(
                                           child: Text(
                                             Format.formatToRupiah(
-                                                cart.product.price!),
+                                                cart.product.price),
                                             style: const TextStyle(
                                               color: Colors.white54,
                                             ),
@@ -190,8 +195,8 @@ class CheckoutPage extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(cart.lens.name!),
-                              Text(Format.formatToRupiah(cart.lens.price!)),
+                              Text(cart.lens.name ?? ''),
+                              Text(Format.formatToRupiah(cart.lens.price)),
                             ],
                           ),
                           if (cart.minusData?.leftEyeMinus != null &&
@@ -336,31 +341,51 @@ class CheckoutPage extends StatelessWidget {
                               );
                             }
 
-                            // try {
-                            var orderId = await transactProv.addTransaction(
-                                order, cartId);
-                            var transactData = await midtransHelper
-                                .getTransactToken(orderId, grandTotal);
-                            await transactProv.updatePaymentData(
-                                orderId, orderId, transactData['redirect_url']);
-                            if (context.mounted) {
-                              Provider.of<CartProvider>(context, listen: false)
-                                  .removeFromProvider(products);
-                              Navigator.of(context).pushNamed(
-                                PaymentWebView.routeName,
-                                arguments: {
-                                  'url': transactData['redirect_url'],
-                                  'id': orderId,
-                                },
+                            try {
+                              var orderId = await transactProv.addTransaction(
+                                  order, cartId);
+                              var transactData = await midtransHelper
+                                  .getTransactToken(orderId, grandTotal);
+                              await transactProv.updatePaymentData(orderId,
+                                  orderId, transactData['redirect_url']);
+                              if (context.mounted) {
+                                Provider.of<CartProvider>(context,
+                                        listen: false)
+                                    .removeFromProvider(products);
+
+                                /// Add to provider
+                                /// add new copy with prefilled data
+                                order = order.copyWith(
+                                  id: orderId,
+                                  orderMadeTime: Timestamp.fromDate(
+                                    DateTime.now(),
+                                  ),
+                                  paymentExpiry: Timestamp.fromDate(
+                                    DateTime.now().add(
+                                      const Duration(days: 1),
+                                    ),
+                                  ),
+                                );
+
+                                Provider.of<OrderProvider>(context,
+                                        listen: false)
+                                    .addToWaitingPayments(order);
+
+                                Navigator.of(context).pushNamed(
+                                  PaymentWebView.routeName,
+                                  arguments: {
+                                    'url': transactData['redirect_url'],
+                                    'id': orderId,
+                                  },
+                                );
+                              }
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('$e'),
+                                ),
                               );
                             }
-                            // } catch (e) {
-                            //   ScaffoldMessenger.of(context).showSnackBar(
-                            //     SnackBar(
-                            //       content: Text('$e'),
-                            //     ),
-                            //   );
-                            // }
                           },
                     child: Container(
                       height: 50,

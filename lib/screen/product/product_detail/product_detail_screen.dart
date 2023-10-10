@@ -36,7 +36,12 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   @override
   void initState() {
     /// get image length only, not include colors
-    imagesLength = widget.glassFrame.imageUrl!.length;
+    if (widget.glassFrame.imageUrl != null &&
+        widget.glassFrame.imageUrl!.isNotEmpty) {
+      imagesLength = widget.glassFrame.imageUrl!.length;
+    } else {
+      imagesLength = 0;
+    }
 
     Provider.of<FrameProvider>(context, listen: false)
         .getFrameDetail(widget.glassFrame.id!)
@@ -158,7 +163,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          Format.formatToRupiah(widget.glassFrame.price),
+                          Format.formatToRupiah(widget.glassFrame.price ?? 0),
                           style: Theme.of(context)
                               .textTheme
                               .bodyMedium!
@@ -232,7 +237,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       color: Colors.amber,
                     ),
                     const SizedBox(width: 5),
-                    Text(widget.glassFrame.rating!),
+                    Text(widget.glassFrame.rating ?? ''),
                   ],
                 ),
                 const Divider(),

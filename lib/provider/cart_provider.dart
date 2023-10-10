@@ -44,8 +44,10 @@ class CartProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future removeFromProvider(List<Cart> cart) async {
-    cart.map((e) => _carts.remove(e));
+  Future removeFromProvider(List<Cart> carts) async {
+    for (var cart in carts){
+      _carts.remove(cart);
+    }
     notifyListeners();
   }
 }

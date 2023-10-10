@@ -50,28 +50,30 @@ class GlassFrame {
     };
   }
 
-  factory GlassFrame.fromMap(Map<String, dynamic> map) {
+  factory GlassFrame.fromMap(Map<String, dynamic>? map) {
     List<ColorVariant> colorVariants = [];
-    (map['colors'] as Map).forEach((key, value) {
-      colorVariants.add(
-        ColorVariant(
-          name: key,
-          qty: value['qty'],
-          url: value['url'],
-        ),
-      );
-    });
+    if (map?['colors'] != null) {
+      (map?['colors'] as Map).forEach((key, value) {
+        colorVariants.add(
+          ColorVariant(
+            name: key,
+            qty: value['qty'],
+            url: value['url'],
+          ),
+        );
+      });
+    }
     return GlassFrame(
-      id: map['id'],
-      imageUrl: List<String>.from(map['imageUrl']),
-      name: map['name'],
-      price: map['price']?.toInt(),
-      rating: map['rating'],
-      description: map['description'],
-      type: map['type'],
-      shape: map['shape'],
-      gender: map['gender'],
-      material: map['material'],
+      id: map?['id'],
+      imageUrl: List<String>.from(map?['imageUrl'] ?? []),
+      name: map?['name'],
+      price: map?['price']?.toInt() ?? 0,
+      rating: map?['rating'] ?? '0',
+      description: map?['description'] ?? '',
+      type: map?['type'] ?? '',
+      shape: map?['shape'] ?? '',
+      gender: map?['gender'] ?? '',
+      material: map?['material'] ?? '',
       colors: colorVariants,
     );
   }

@@ -36,6 +36,7 @@ class Orderspage extends StatelessWidget {
 
 class CustomTabbarWidget extends StatelessWidget {
   final String status;
+
   const CustomTabbarWidget({
     Key? key,
     required this.status,
@@ -102,6 +103,7 @@ class CustomTabbarWidget extends StatelessWidget {
                   builder: (context, value, child) => InkWell(
                     onTap: () {
                       value.order = order;
+                      print(order.toString());
                       Navigator.of(context).pushNamed(
                         OrderDetailPage.routeName,
                         arguments: order,
@@ -121,7 +123,17 @@ class CustomTabbarWidget extends StatelessWidget {
                               ),
                               margin: const EdgeInsets.only(right: 10),
                               child: Image.network(
-                                order.cartProduct![0].product.colors![0].url!,
+                                order.cartProduct!.isNotEmpty &&
+                                        order.cartProduct != null &&
+                                        order.cartProduct![0].product.colors!
+                                            .isNotEmpty &&
+                                        order.cartProduct![0].product.colors![0]
+                                                .url !=
+                                            null
+                                    ? order
+                                        .cartProduct![0].product.colors![0].url!
+                                    : 'https://firebasestorage.googleapis.com/v0/b/satria-jaya-optik.appspot.com/o/default%2Fbonbon-boy-with-red-hair-and-glasses.png?alt=media&token=53c99253-a46d-4f31-9851-48b6b76b1d54',
+
                                 // order.cartProduct![0].product
                                 //     .colors![order.cartProduct![0].color].url!,
                                 fit: BoxFit.cover,

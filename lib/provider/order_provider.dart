@@ -8,6 +8,7 @@ class OrderProvider extends ChangeNotifier {
   Map<String, dynamic> _status = {};
   ConnectionState _state = ConnectionState.none;
   ConnectionState _individualState = ConnectionState.none;
+
   // List<Transactions>? _orders = [];
   List<Transactions> _waitingPayments = [];
   List<Transactions> _packings = [];
@@ -17,17 +18,29 @@ class OrderProvider extends ChangeNotifier {
   Transactions _order = Transactions();
 
   ConnectionState get state => _state;
+
   ConnectionState get individualState => _individualState;
+
   // List<Transactions>? get orders => _orders;
   List<Transactions> get waitingPayments => _waitingPayments;
+
   List<Transactions> get packings => _packings;
+
   List<Transactions> get delivering => _delivering;
+
   List<Transactions> get completed => _completed;
+
   List<Transactions> get cancelled => _cancelled;
+
   Transactions get order => _order;
 
   set order(Transactions order) {
     _order = order;
+    notifyListeners();
+  }
+
+  addToWaitingPayments(Transactions transactions) {
+    _waitingPayments.add(transactions);
     notifyListeners();
   }
 
