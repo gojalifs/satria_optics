@@ -76,7 +76,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => ChatProvider()),
       ],
       child: MaterialApp(
-        title: 'Flutter Demo',
+        title: 'Satria Jaya Optik',
         theme: CustomTheme.customTheme,
         home: const SplashPage(),
         routes: {
