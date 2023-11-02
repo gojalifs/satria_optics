@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:satria_optik/screen/auth/login_screen.dart';
@@ -18,9 +19,12 @@ class SplashPage extends StatefulWidget {
 
 class _SplashPageState extends State<SplashPage> {
   var user = UserProfile();
+  late Brightness brightness;
 
   @override
   void initState() {
+    brightness =
+        SchedulerBinding.instance.platformDispatcher.platformBrightness;
     Provider.of<AuthProvider>(context, listen: false)
         .getLoginStatus()
         .then((uid) async {
@@ -52,7 +56,14 @@ class _SplashPageState extends State<SplashPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.abc_rounded),
+            SizedBox(
+              width: 100,
+              height: 100,
+              child: brightness == Brightness.dark
+                  ? Image.asset("assets/launcher/launcher_icon-dark.png")
+                  : Image.asset("assets/launcher/launcher_icon.png"),
+            ),
+            const SizedBox(height: 20),
             LoadingAnimationWidget.threeArchedCircle(
               color: Colors.white,
               size: 25,
