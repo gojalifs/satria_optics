@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:satria_optik/provider/favorite_provider.dart';
@@ -245,10 +246,16 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   'Description',
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
-                Text(
-                  '${frame.description}',
-                  style: const TextStyle(color: Colors.white70),
+                MarkdownBody(
+                  data: '${frame.description}',
+                  styleSheet: MarkdownStyleSheet(
+                    p: const TextStyle(color: Colors.white70),
+                  ),
                 ),
+                // Text(
+                //   '${frame.description}',
+                //   style: const TextStyle(color: Colors.white70),
+                // ),
                 const Divider(
                   thickness: 2,
                   color: Colors.white70,
