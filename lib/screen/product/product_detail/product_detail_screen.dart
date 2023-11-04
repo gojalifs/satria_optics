@@ -252,10 +252,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     p: const TextStyle(color: Colors.white70),
                   ),
                 ),
-                // Text(
-                //   '${frame.description}',
-                //   style: const TextStyle(color: Colors.white70),
-                // ),
                 const Divider(
                   thickness: 2,
                   color: Colors.white70,
