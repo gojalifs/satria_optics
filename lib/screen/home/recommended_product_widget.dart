@@ -32,7 +32,11 @@ class RecommendedWidget extends StatelessWidget {
           height: 176,
           child: Stack(
             children: [
-              ListView.builder(
+              GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                ),
+                primary: false,
                 scrollDirection: Axis.horizontal,
                 shrinkWrap: true,
                 itemCount: products.length,

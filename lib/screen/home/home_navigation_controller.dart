@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:satria_optik/screen/cart/cart_screen.dart';
 import 'package:satria_optik/screen/orders/order_list_screen.dart';
-import 'package:satria_optik/screen/product/product_home_screen.dart';
 
 import '../favorite/favourite_screen.dart';
 import '../message/messenger_screen.dart';
@@ -31,10 +30,10 @@ class _HomeNavigationState extends State<HomeNavigation> {
       icon: Icon(Icons.favorite_rounded),
       label: 'Favorite',
     ),
-    BottomNavigationBarItem(
-      icon: Icon(Icons.format_align_justify_outlined),
-      label: 'All Product',
-    ),
+    // BottomNavigationBarItem(
+    //   icon: Icon(Icons.format_align_justify_outlined),
+    //   label: 'All Product',
+    // ),
     BottomNavigationBarItem(
       icon: Icon(Icons.view_list_rounded),
       label: 'Orders',
@@ -77,10 +76,10 @@ class _HomeNavigationState extends State<HomeNavigation> {
               : botNavIndex == 1
                   ? const FavouritePage()
                   : botNavIndex == 2
-                      ? const ProductPage()
-                      : botNavIndex == 3
-                          ? const Orderspage()
-                          : const ProfilePage(),
+                      // ? const ProductPage()
+                      // : botNavIndex == 3
+                      ? const Orderspage()
+                      : const ProfilePage(),
         ),
       ),
     );

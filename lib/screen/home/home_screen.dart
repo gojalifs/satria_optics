@@ -16,7 +16,9 @@ class HomePage extends StatelessWidget {
     });
     return Consumer<FrameProvider>(
       builder: (context, value, child) => ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
+        // padding: const EdgeInsets.symmetric(horizontal: 10),
+        // primary: false,
+        physics: const BouncingScrollPhysics(),
         children: [
           const SizedBox(height: 20),
           Image.asset(
@@ -25,16 +27,8 @@ class HomePage extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           RecommendedWidget(
-            products: value.frames!,
-            title: 'Big Discount Ever',
-          ),
-          RecommendedWidget(
-            products: value.frames!,
-            title: 'New on Satria Optik',
-          ),
-          RecommendedWidget(
-            products: value.frames!,
-            title: 'Popular Right Now',
+            products: value.frames,
+            title: 'Best Products',
           ),
         ],
       ),

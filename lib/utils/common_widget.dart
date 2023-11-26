@@ -65,10 +65,37 @@ class ProductCard extends StatelessWidget {
             children: [
               Expanded(
                 flex: 3,
-                child: products[index].imageUrl != null ? Image.network(
-                  products[index].imageUrl![0],
-                  fit: BoxFit.fill,
-                ) : const Icon(Icons.image_not_supported_rounded),
+                child: products[index].imageUrl != null
+                    ? Image.network(
+                        products[index].imageUrl![0],
+                        frameBuilder:
+                            (context, child, frame, wasSynchronouslyLoaded) {
+                          if (wasSynchronouslyLoaded) {
+                            return child;
+                          }
+                          return AnimatedOpacity(
+                            opacity: frame == null ? 0 : 1,
+                            duration: const Duration(seconds: 1),
+                            curve: Curves.easeOut,
+                            child: child,
+                          );
+                        },
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) {
+                            return child;
+                          }
+                          return Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                  : null,
+                            ),
+                          );
+                        },
+                        fit: BoxFit.fill,
+                      )
+                    : const Icon(Icons.image_not_supported_rounded),
               ),
               Expanded(
                 child: Align(
@@ -82,8 +109,8 @@ class ProductCard extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(Format.formatToRupiah(products[index].price ?? 0),
-
+                    Text(
+                      Format.formatToRupiah(products[index].price ?? 0),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: const Color.fromRGBO(255, 69, 0, 1),
                           ),
