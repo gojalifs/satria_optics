@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 
-import 'package:satria_optik/provider/auth_provider.dart';
+import 'package:satria_optik/provider/auth_provider.dart' as authProv;
 import 'package:satria_optik/provider/user_provider.dart';
 import 'package:satria_optik/screen/auth/tos_screen.dart';
 
@@ -100,19 +100,22 @@ class _LoginPageState extends State<LoginPage> {
                           return null;
                         },
                       ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.pushNamed(
-                                context, ForgotPasswordPage.routeName);
-                          },
-                          child: const Text('Forgot Password?'),
-                        ),
-                      ),
+                      /* 
+                        TODO uncomment when app check implemented in firebase
+                       */
+                      // Align(
+                      //   alignment: Alignment.centerRight,
+                      //   child: TextButton(
+                      //     onPressed: () {
+                      //       Navigator.pushNamed(
+                      //           context, ForgotPasswordPage.routeName);
+                      //     },
+                      //     child: const Text('Forgot Password?'),
+                      //   ),
+                      // ),
                       Row(
                         children: [
-                          Consumer<AuthProvider>(
+                          Consumer<authProv.AuthProvider>(
                             builder: (context, authProv, child) {
                               return Checkbox.adaptive(
                                 value: authProv.isTosApproved,
@@ -167,7 +170,7 @@ class _LoginPageState extends State<LoginPage> {
                         ],
                       ),
                       const SizedBox(height: 10),
-                      Consumer2<AuthProvider, UserProvider>(
+                      Consumer2<authProv.AuthProvider, UserProvider>(
                         builder: (context, auth, user, child) =>
                             ElevatedButton.icon(
                           onPressed: auth.isTosApproved
@@ -190,15 +193,18 @@ class _LoginPageState extends State<LoginPage> {
                                       },
                                     );
                                   } catch (e) {
-                                    Navigator.of(context).pop();
-                                    if (e.toString().contains('null')) {
-                                      return;
+                                    if (context.mounted) {
+                                      Navigator.of(context).pop();
+                                      if (e.toString().contains('null')) {
+                                        return;
+                                      }
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text('$e'),
+                                        ),
+                                      );
                                     }
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text('$e'),
-                                      ),
-                                    );
                                   }
                                 }
                               : null,
@@ -227,11 +233,11 @@ class _LoginPageState extends State<LoginPage> {
 
 class LoginWithPassword extends StatelessWidget {
   const LoginWithPassword({
-    Key? key,
+    super.key,
     required this.emailController,
     required this.passController,
     required this.formKey,
-  }) : super(key: key);
+  });
 
   final TextEditingController emailController;
   final TextEditingController passController;
@@ -239,7 +245,7 @@ class LoginWithPassword extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AuthProvider>(
+    return Consumer<authProv.AuthProvider>(
       builder: (context, authProv, child) => ElevatedButton(
         onPressed: authProv.isTosApproved
             ? () async {
@@ -268,17 +274,21 @@ class LoginWithPassword extends StatelessWidget {
                       },
                     );
                   } on FirebaseAuthException {
-                    Navigator.of(context).pop();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Invalid Credentials'),
-                      ),
-                    );
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Invalid Credentials'),
+                        ),
+                      );
+                    }
                   } catch (e) {
-                    Navigator.of(context).pop();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('$e')),
-                    );
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('$e')),
+                      );
+                    }
                     debugPrint('$e');
                   }
                 }

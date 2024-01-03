@@ -59,16 +59,6 @@ class RegisterPage extends StatelessWidget {
                         inputType: TextInputType.visiblePassword,
                       ),
                       const SizedBox(height: 20),
-                      CustomTextFormField(
-                        controller: birthController,
-                        label: 'Birth',
-                      ),
-                      const SizedBox(height: 20),
-                      CustomTextFormField(
-                        controller: genderController,
-                        label: 'Gender',
-                      ),
-                      const SizedBox(height: 20),
                       Consumer2<AuthProvider, UserProvider>(
                         builder: (context, auth, user, child) => ElevatedButton(
                           onPressed: () async {
