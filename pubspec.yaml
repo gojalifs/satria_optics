@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: '>=3.2.0 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -42,8 +42,8 @@ dependencies:
   flutter_launcher_icons: ^0.13.1
   flutter_markdown: ^0.6.18
   google_sign_in: ^6.1.5
-  http: ^1.1.0
-  image_picker: ^0.8.9
+  http: ^1.1.1
+  image_picker: ^1.0.4
   intl: ^0.18.1
   loading_animation_widget: ^1.2.0+4
   path_provider: ^2.0.15
@@ -52,7 +52,7 @@ dependencies:
   webview_flutter: ^4.2.2
 
 dev_dependencies:
-  flutter_lints: ^2.0.0
+  flutter_lints: ^3.0.1
   flutter_test:
     sdk: flutter
 
